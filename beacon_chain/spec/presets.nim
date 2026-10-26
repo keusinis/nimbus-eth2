@@ -128,6 +128,8 @@ type
     GLOAS_FORK_EPOCH*: Epoch
     HEZE_FORK_VERSION*: Version
     HEZE_FORK_EPOCH*: Epoch
+    EIP8321_FORK_VERSION*: Version
+    EIP8321_FORK_EPOCH*: Epoch
 
     # Time parameters
     timeParams*: TimeParams
@@ -305,6 +307,9 @@ when const_preset == "mainnet":
     # Heze
     HEZE_FORK_VERSION: Version [byte 0x08, 0x00, 0x00, 0x00],
     HEZE_FORK_EPOCH: FAR_FUTURE_EPOCH,
+    # EIP8321
+    EIP8321_FORK_VERSION: Version [byte 0xe8, 0x32, 0x10, 0x00],
+    EIP8321_FORK_EPOCH: FAR_FUTURE_EPOCH,
 
     # Time parameters
     # ---------------------------------------------------------------
@@ -524,6 +529,9 @@ elif const_preset == "gnosis":
     # Heze
     HEZE_FORK_VERSION: Version [byte 0x08, 0x00, 0x00, 0x64],
     HEZE_FORK_EPOCH: FAR_FUTURE_EPOCH,
+    # EIP8321
+    EIP8321_FORK_VERSION: Version [byte 0xe8, 0x32, 0x10, 0x64],
+    EIP8321_FORK_EPOCH: FAR_FUTURE_EPOCH,
 
     # Time parameters
     # ---------------------------------------------------------------
@@ -737,6 +745,9 @@ elif const_preset == "minimal":
     # Heze
     HEZE_FORK_VERSION: Version [byte 0x08, 0x00, 0x00, 0x01],
     HEZE_FORK_EPOCH: Epoch(uint64.high),
+    # EIP8321
+    EIP8321_FORK_VERSION: Version [byte 0xe8, 0x32, 0x10, 0x01],
+    EIP8321_FORK_EPOCH: Epoch(uint64.high),
 
     # Time parameters
     # ---------------------------------------------------------------

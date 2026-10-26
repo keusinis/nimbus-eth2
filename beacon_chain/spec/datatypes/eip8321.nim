@@ -1,0 +1,428 @@
+# beacon_chain
+# Copyright (c) 2026 Status Research & Development GmbH
+# Licensed and distributed under either of
+#   * MIT license (license terms in the root directory or at https://opensource.org/licenses/MIT).
+#   * Apache v2 license (license terms in the root directory or at https://www.apache.org/licenses/LICENSE-2.0).
+# at your option. This file may not be copied, modified, or distributed except according to those terms.
+
+{.push raises: [], gcsafe.}
+
+# Types specific to EIP8321 (i.e. known to have changed across hard forks) - see
+# `base` for types and guidelines common across forks
+
+# TODO Careful, not nil analysis is broken / incomplete and the semantics will
+#      likely change in future versions of the language:
+#      https://github.com/nim-lang/RFCs/issues/250
+{.experimental: "notnil".}
+
+import
+  std/typetraits,
+  ./[phase0, base, bellatrix, electra, fulu],
+  chronicles,
+  json_serialization,
+  ssz_serialization/[merkleization, proofs],
+  ssz_serialization/types as sszTypes,
+  ../digest,
+  kzg4844/[kzg, kzg_abi]
+
+from ./altair import
+  ParticipationFlags, SyncAggregate, SyncCommittee, TrustedSyncAggregate,
+  SyncnetBits, num_active_participants
+from ./capella import
+  HistoricalSummary, SignedBLSToExecutionChange, Withdrawal
+from ./deneb import Blobs
+from ./gloas import
+  Builder, BuilderPendingPayment, BuilderPendingWithdrawal,
+  EpochParticipationFlags, ExecutionRequests, InactivityScores, KzgCommitments,
+  PayloadAttestation, SignedBLSToExecutionChangeList
+from ./heze import
+  ExecutionPayloadBid, InclusionList, InclusionListBits,
+  SignedExecutionPayloadBid, SignedInclusionList
+
+export json_serialization, base
+
+type
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#randaocommitmentregistration
+  RandaoCommitmentRegistration* = object
+    validator_index*: uint64 # `ValidatorIndex` after validation
+    commitment*: Eth2Digest
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#signedrandaocommitmentregistration
+  SignedRandaoCommitmentRegistration* = object
+    message*: RandaoCommitmentRegistration
+    signature*: ValidatorSig
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#pendingrandaocommitment
+  PendingRandaoCommitment* = object
+    validator_index*: uint64 # `ValidatorIndex` after validation
+    commitment*: Eth2Digest
+    activation_epoch*: Epoch
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#types
+  RandaoCommitments* = HashSeq[Eth2Digest]
+  PendingRandaoCommitments* = HashSeq[PendingRandaoCommitment]
+  RandaoCommitmentRegistrations* = seq[SignedRandaoCommitmentRegistration]
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#beaconstate
+  BeaconState* {.sszActiveFields: [
+      1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1].} = object
+    # Versioning
+    genesis_time*: uint64
+    genesis_validators_root*: Eth2Digest
+    slot*: Slot
+    fork*: Fork
+
+    # History
+    latest_block_header*: BeaconBlockHeader
+      ## `latest_block_header.state_root == ZERO_HASH` temporarily
+
+    block_roots*: HashArray[Limit SLOTS_PER_HISTORICAL_ROOT, Eth2Digest]
+      ## Needed to process attestations, older to newer
+
+    state_roots*: HashArray[Limit SLOTS_PER_HISTORICAL_ROOT, Eth2Digest]
+    historical_roots*: HashList[Eth2Digest, Limit HISTORICAL_ROOTS_LIMIT]
+      ## Frozen in Capella, replaced by historical_summaries
+
+    # Registry
+    validators*: HashSeq[Validator]
+    balances*: HashSeq[Gwei]
+
+    # Randomness
+    randao_mixes*: HashArray[Limit EPOCHS_PER_HISTORICAL_VECTOR, Eth2Digest]
+
+    # Slashings
+    slashings*: HashArray[Limit EPOCHS_PER_SLASHINGS_VECTOR, Gwei]
+      ## Per-epoch sums of slashed effective balances
+
+    # Participation
+    previous_epoch_participation*: gloas.EpochParticipationFlags
+    current_epoch_participation*: gloas.EpochParticipationFlags
+
+    # Finality
+    justification_bits*: JustificationBits
+      ## Bit set for every recent justified epoch
+
+    previous_justified_checkpoint*: Checkpoint
+    current_justified_checkpoint*: Checkpoint
+    finalized_checkpoint*: Checkpoint
+
+    # Inactivity
+    inactivity_scores*: gloas.InactivityScores
+
+    # Light client sync committees
+    current_sync_committee*: SyncCommittee
+    next_sync_committee*: SyncCommittee
+
+    latest_block_hash*: Eth2Digest
+
+    # Withdrawals
+    next_withdrawal_index*: WithdrawalIndex
+    next_withdrawal_validator_index*: uint64
+
+    # Deep history valid from Capella onwards
+    historical_summaries*:
+      HashList[HistoricalSummary, Limit HISTORICAL_ROOTS_LIMIT]
+
+    deposit_balance_to_consume*: Gwei
+    exit_balance_to_consume*: Gwei
+    earliest_exit_epoch*: Epoch
+    consolidation_balance_to_consume*: Gwei
+    earliest_consolidation_epoch*: Epoch
+    pending_deposits*: HashSeq[PendingDeposit]
+    pending_partial_withdrawals*: HashSeq[PendingPartialWithdrawal]
+    pending_consolidations*: HashSeq[PendingConsolidation]
+
+    proposer_lookahead*:
+        HashArray[Limit ((MIN_SEED_LOOKAHEAD + 1) * SLOTS_PER_EPOCH), uint64]
+
+    builders*: HashSeq[Builder]
+    next_withdrawal_builder_index*: uint64
+    execution_payload_availability*: BitArray[int(SLOTS_PER_HISTORICAL_ROOT)]
+    builder_pending_payments*:
+      HashArray[Limit 2 * SLOTS_PER_EPOCH, BuilderPendingPayment]
+    builder_pending_withdrawals*: HashSeq[BuilderPendingWithdrawal]
+
+    # Execution
+    latest_execution_payload_bid*: ExecutionPayloadBid
+
+    payload_expected_withdrawals*: HashSeq[Withdrawal]
+    ptc_window*:
+      HashArray[Limit ((2 + MIN_SEED_LOOKAHEAD) * SLOTS_PER_EPOCH),
+        HashArray[Limit PTC_SIZE, uint64]]
+
+    # [New in EIP8321]
+    randao_commitments*: RandaoCommitments
+    # [New in EIP8321]
+    pending_randao_commitments*: PendingRandaoCommitments
+
+  # TODO Careful, not nil analysis is broken / incomplete and the semantics will
+  #      likely change in future versions of the language:
+  #      https://github.com/nim-lang/RFCs/issues/250
+  BeaconStateRef* = ref BeaconState not nil
+  NilableBeaconStateRef* = ref BeaconState
+
+  # TODO: There should be only a single generic HashedBeaconState definition
+  HashedBeaconState* = object
+    data*: BeaconState
+    root*: Eth2Digest # hash_tree_root(data)
+
+  # https://github.com/ethereum/consensus-specs/blob/v1.5.0-beta.4/specs/phase0/beacon-chain.md#beaconblock
+  BeaconBlock* = object
+    ## For each slot, a proposer is chosen from the validator pool to propose
+    ## a new block. Once the block as been proposed, it is transmitted to
+    ## validators that will have a chance to vote on it through attestations.
+    ## Each block collects attestations, or votes, on past blocks, thus a chain
+    ## is formed.
+
+    slot*: Slot
+    proposer_index*: uint64 # `ValidatorIndex` after validation
+
+    parent_root*: Eth2Digest
+      ## Root hash of the previous block
+
+    state_root*: Eth2Digest
+      ## The state root, _after_ this block has been processed
+
+    body*: BeaconBlockBody
+
+  SigVerifiedBeaconBlock* = object
+    ## A BeaconBlock that contains verified signatures
+    ## but that has not been verified for state transition
+
+    slot*: Slot
+    proposer_index*: uint64 # `ValidatorIndex` after validation
+
+    parent_root*: Eth2Digest
+      ## Root hash of the previous block
+
+    state_root*: Eth2Digest
+      ## The state root, _after_ this block has been processed
+
+    body*: SigVerifiedBeaconBlockBody
+
+  TrustedBeaconBlock* = object
+    ## When we receive blocks from outside sources, they are untrusted and go
+    ## through several layers of validation. Blocks that have gone through
+    ## validations can be trusted to be well-formed, with a correct signature,
+    ## having a parent and applying cleanly to the state that their parent
+    ## left them with.
+    ##
+    ## When loading such blocks from the database, to rewind states for example,
+    ## it is expensive to redo the validations (in particular, the signature
+    ## checks), thus `TrustedBlock` uses a `TrustedSig` type to mark that these
+    ## checks can be skipped.
+    ##
+    ## TODO this could probably be solved with some type trickery, but there
+    ##      too many bugs in nim around generics handling, and we've used up
+    ##      the trickery budget in the serialization library already. Until
+    ##      then, the type must be manually kept compatible with its untrusted
+    ##      cousin.
+    slot*: Slot
+    proposer_index*: uint64 # `ValidatorIndex` after validation
+    parent_root*: Eth2Digest
+    state_root*: Eth2Digest
+    body*: TrustedBeaconBlockBody
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#beaconblockbody
+  BeaconBlockBody* {.sszActiveFields: [
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1].} = object
+    randao_reveal*: ValidatorSig
+    graffiti*: GraffitiBytes
+      ## Arbitrary data
+
+    # Operations
+    proposer_slashings*: seq[ProposerSlashing]
+    attester_slashings*: seq[gloas.AttesterSlashing]
+    attestations*: seq[gloas.Attestation]
+    voluntary_exits*: seq[SignedVoluntaryExit]
+
+    sync_aggregate*: SyncAggregate
+
+    # Execution
+    bls_to_execution_changes*: SignedBLSToExecutionChangeList
+
+    signed_execution_payload_bid*: SignedExecutionPayloadBid
+    payload_attestations*: seq[PayloadAttestation]
+    parent_execution_requests*: gloas.ExecutionRequests
+
+    # [New in EIP8321]
+    hash_chain_reveal*: Eth2Digest
+    # [New in EIP8321]
+    randao_commitment_registrations*: RandaoCommitmentRegistrations
+
+  SigVerifiedBeaconBlockBody* {.sszActiveFields: [
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1].} = object
+    ## A BeaconBlock body with signatures verified
+    ## including:
+    ## - Randao reveal
+    ## - Attestations
+    ## - ProposerSlashing (SignedBeaconBlockHeader)
+    ## - AttesterSlashing (IndexedAttestation)
+    ## - SignedVoluntaryExits
+    ## - SyncAggregate
+    ##
+    ## However:
+    ## - ETH1Data (Deposits) can contain invalid BLS signatures
+    ##
+    ## The block state transition has NOT been verified
+    randao_reveal*: TrustedSig
+    graffiti*: GraffitiBytes
+      ## Arbitrary data
+
+    # Operations
+    proposer_slashings*: seq[TrustedProposerSlashing]
+    attester_slashings*: seq[gloas.TrustedAttesterSlashing]
+    attestations*: seq[gloas.TrustedAttestation]
+    voluntary_exits*: seq[TrustedSignedVoluntaryExit]
+
+    sync_aggregate*: TrustedSyncAggregate
+
+    # Execution
+    bls_to_execution_changes*: SignedBLSToExecutionChangeList
+
+    signed_execution_payload_bid*: SignedExecutionPayloadBid
+    payload_attestations*: seq[PayloadAttestation]
+    parent_execution_requests*: gloas.ExecutionRequests
+
+    # [New in EIP8321]
+    hash_chain_reveal*: Eth2Digest
+    # [New in EIP8321]
+    randao_commitment_registrations*: RandaoCommitmentRegistrations
+
+  TrustedBeaconBlockBody* {.sszActiveFields: [
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1].} = object
+    ## A full verified block
+    randao_reveal*: TrustedSig
+    graffiti*: GraffitiBytes
+      ## Arbitrary data
+
+    # Operations
+    proposer_slashings*: seq[TrustedProposerSlashing]
+    attester_slashings*: seq[gloas.TrustedAttesterSlashing]
+    attestations*: seq[gloas.TrustedAttestation]
+    voluntary_exits*: seq[TrustedSignedVoluntaryExit]
+
+    sync_aggregate*: TrustedSyncAggregate
+
+    # Execution
+    bls_to_execution_changes*: SignedBLSToExecutionChangeList
+
+    signed_execution_payload_bid*: SignedExecutionPayloadBid
+    payload_attestations*: seq[PayloadAttestation]
+    parent_execution_requests*: gloas.ExecutionRequests
+
+    # [New in EIP8321]
+    hash_chain_reveal*: Eth2Digest
+    # [New in EIP8321]
+    randao_commitment_registrations*: RandaoCommitmentRegistrations
+
+  # https://github.com/ethereum/consensus-specs/blob/v1.5.0-beta.4/specs/phase0/beacon-chain.md#signedbeaconblock
+  SignedBeaconBlock* = object
+    message*: BeaconBlock
+    signature*: ValidatorSig
+
+    root* {.dontSerialize.}: Eth2Digest # cached root of signed beacon block
+
+  SigVerifiedSignedBeaconBlock* = object
+    ## A SignedBeaconBlock with signatures verified
+    ## including:
+    ## - Block signature
+    ## - BeaconBlockBody
+    ##   - Randao reveal
+    ##   - Attestations
+    ##   - ProposerSlashing (SignedBeaconBlockHeader)
+    ##   - AttesterSlashing (IndexedAttestation)
+    ##   - SignedVoluntaryExits
+    ##
+    ##   - ETH1Data (Deposits) can contain invalid BLS signatures
+    ##
+    ## The block state transition has NOT been verified
+    message*: SigVerifiedBeaconBlock
+    signature*: TrustedSig
+
+    root* {.dontSerialize.}: Eth2Digest # cached root of signed beacon block
+
+  TrustedSignedBeaconBlock* = object
+    message*: TrustedBeaconBlock
+    signature*: TrustedSig
+
+    root* {.dontSerialize.}: Eth2Digest # cached root of signed beacon block
+
+  SomeSignedBeaconBlock* =
+    SignedBeaconBlock |
+    SigVerifiedSignedBeaconBlock |
+    TrustedSignedBeaconBlock
+  SomeBeaconBlock* =
+    BeaconBlock |
+    SigVerifiedBeaconBlock |
+    TrustedBeaconBlock
+  SomeBeaconBlockBody* =
+    BeaconBlockBody |
+    SigVerifiedBeaconBlockBody |
+    TrustedBeaconBlockBody
+
+  BlockContents* = object
+    `block`*: eip8321.BeaconBlock
+    kzg_proofs*: fulu.KzgProofs
+    blobs*: Blobs
+
+func shortLog*(v: SomeBeaconBlock): auto =
+  (
+    slot: shortLog(v.slot),
+    proposer_index: v.proposer_index,
+    parent_root: shortLog(v.parent_root),
+    state_root: shortLog(v.state_root),
+    eth1data: default(Eth1Data),
+    graffiti: $v.body.graffiti,
+    proposer_slashings_len: v.body.proposer_slashings.len(),
+    attester_slashings_len: v.body.attester_slashings.len(),
+    attestations_len: v.body.attestations.len(),
+    deposits_len: 0,
+    voluntary_exits_len: v.body.voluntary_exits.len(),
+    sync_committee_participants: v.body.sync_aggregate.num_active_participants,
+    block_number: 0'u64,
+    # TODO checksum hex? shortlog?
+    block_hash: "",
+    parent_hash: "",
+    fee_recipient: "",
+    bls_to_execution_changes_len: v.body.bls_to_execution_changes.len(),
+    blob_kzg_commitments_len: v.body.signed_execution_payload_bid.message.blob_kzg_commitments.len(),
+  )
+
+func shortLog*(v: SomeSignedBeaconBlock): auto =
+  (
+    blck: shortLog(v.message),
+    signature: shortLog(v.signature)
+  )
+
+template asSigned*(
+    x: SigVerifiedSignedBeaconBlock |
+       TrustedSignedBeaconBlock): SignedBeaconBlock =
+  isomorphicCast[SignedBeaconBlock](x)
+
+template asSigVerified*(
+    x: SignedBeaconBlock |
+       TrustedSignedBeaconBlock): SigVerifiedSignedBeaconBlock =
+  isomorphicCast[SigVerifiedSignedBeaconBlock](x)
+
+template asSigVerified*(
+    x: BeaconBlock | TrustedBeaconBlock): SigVerifiedBeaconBlock =
+  isomorphicCast[SigVerifiedBeaconBlock](x)
+
+template asTrusted*(
+    x: SignedBeaconBlock |
+       SigVerifiedSignedBeaconBlock): TrustedSignedBeaconBlock =
+  isomorphicCast[TrustedSignedBeaconBlock](x)
+
+# Helpers to frequently used values
+template builder_index*(v: BeaconBlock | TrustedBeaconBlock): uint64 =
+  if v.body.signed_execution_payload_bid.message.builder_index ==
+      BUILDER_INDEX_SELF_BUILD:
+    v.proposer_index
+  else:
+    v.body.signed_execution_payload_bid.message.builder_index
+template builder_index*(
+    v: SignedBeaconBlock | TrustedSignedBeaconBlock): uint64 =
+  v.message.builder_index

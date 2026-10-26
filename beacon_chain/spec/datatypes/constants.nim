@@ -63,6 +63,9 @@ const
   # https://github.com/ethereum/consensus-specs/blob/v1.7.0-alpha.12/specs/heze/beacon-chain.md#domains
   DOMAIN_INCLUSION_LIST_COMMITTEE* = DomainType([byte 0x10, 0x00, 0x00, 0x00])
 
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#domains
+  DOMAIN_RANDAO_COMMITMENT_REGISTRATION* = DomainType([byte 0x11, 0x00, 0x00, 0x00])
+
   # https://github.com/ethereum/consensus-specs/blob/v1.4.0-beta.5/specs/phase0/fork-choice.md#configuration
   PROPOSER_SCORE_BOOST*: uint64 = 40
   REORG_PARENT_WEIGHT_THRESHOLD*: uint64 = 160

@@ -10,9 +10,11 @@
 import
   ./minimal/[
     phase0_preset, altair_preset, bellatrix_preset, capella_preset,
-    deneb_preset, electra_preset, fulu_preset, gloas_preset, heze_preset
+    deneb_preset, electra_preset, fulu_preset, gloas_preset, heze_preset,
+    eip8321_preset
   ]
 
 export
   phase0_preset, altair_preset, bellatrix_preset, capella_preset,
-  deneb_preset, electra_preset, fulu_preset, gloas_preset, heze_preset
+  deneb_preset, electra_preset, fulu_preset, gloas_preset, heze_preset,
+  eip8321_preset
