@@ -685,6 +685,33 @@ proc processBlsToExecutionChange*(
 
   return v
 
+proc processRandaoCommitmentRegistration*(
+    self: ref Eth2Processor, src: MsgSource,
+    registration: SignedRandaoCommitmentRegistration):
+    Future[ValidationRes] {.async: (raises: [CancelledError]).} =
+  let
+    wallTime = self.getCurrentBeaconTime()
+    wallSlot = wallTime.slotOrZero(self.dag.timeParams)
+
+  logScope:
+    validator_index = registration.message.validator_index
+    commitment = shortLog(registration.message.commitment)
+    wallSlot
+
+  debug "RANDAO commitment registration received"
+
+  let v = await self.validatorChangePool[].validateRandaoCommitmentRegistration(
+    self.batchCrypto, registration, wallTime)
+
+  if v.isOk():
+    trace "RANDAO commitment registration validated"
+    # Prioritize API-provided messages
+    self.validatorChangePool[].addMessage(registration, src == MsgSource.api)
+  else:
+    debug "Dropping RANDAO commitment registration", reason = $v.error
+
+  return v
+
 proc checkKnownValidatorSlashing(
     self: var Eth2Processor,
     msg:

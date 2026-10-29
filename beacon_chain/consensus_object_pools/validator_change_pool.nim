@@ -29,6 +29,8 @@ const
   # For Capella launch; scale back later
   BLS_TO_EXECUTION_CHANGES_BOUND = 16384'u64
 
+  RANDAO_COMMITMENT_REGISTRATIONS_BOUND = 16384'u64
+
 type
   OnVoluntaryExitCallback =
     proc(data: SignedVoluntaryExit) {.gcsafe, raises: [].}
@@ -59,6 +61,14 @@ type
     bls_to_execution_changes_api*: Deque[SignedBLSToExecutionChange]  ## \
     ## Not a function of chain DAG branch; just used as a FIFO queue for blocks
 
+    randao_commitment_registrations_gossip*:
+      Deque[SignedRandaoCommitmentRegistration]  ## \
+    ## Not a function of chain DAG branch; just used as a FIFO queue for blocks
+
+    randao_commitment_registrations_api*:
+      Deque[SignedRandaoCommitmentRegistration]  ## \
+    ## Not a function of chain DAG branch; just used as a FIFO queue for blocks
+
     prior_seen_attester_slashed_indices: HashSet[uint64] ## \
     ## Records attester-slashed indices seen. Share these across attester
     ## slashing types.
@@ -71,6 +81,9 @@ type
 
     prior_seen_bls_to_execution_change_indices: HashSet[uint64] ##\
     ## Records BLS to execution change indices seen.
+
+    prior_seen_randao_commitment_registration_indices: HashSet[uint64] ##\
+    ## Records RANDAO commitment registration indices seen.
 
     dag*: ChainDAGRef
     attestationPool: ref AttestationPool
@@ -105,6 +118,10 @@ func init*(T: type ValidatorChangePool, dag: ChainDAGRef,
       # given large bound, allow to grow dynamically rather than statically
       # allocate all at once
       initDeque[SignedBLSToExecutionChange](initialSize = 1024),
+    randao_commitment_registrations_gossip:
+      initDeque[SignedRandaoCommitmentRegistration](initialSize = 1024),
+    randao_commitment_registrations_api:
+      initDeque[SignedRandaoCommitmentRegistration](initialSize = 1024),
     dag: dag,
     attestationPool: attestationPool,
     onVoluntaryExitReceived: onVoluntaryExit,
@@ -118,7 +135,8 @@ func addValidatorChangeMessage(
   # Prefer newer to older validator change messages
   while subpool.lenu64 >= bound:
     # TODO remove temporary workaround once capella happens
-    when bound == BLS_TO_EXECUTION_CHANGES_BOUND:
+    when bound == BLS_TO_EXECUTION_CHANGES_BOUND or
+        bound == RANDAO_COMMITMENT_REGISTRATIONS_BOUND:
       seenpool.excl subpool.popFirst().message.validator_index
     else:
       discard subpool.popFirst()
@@ -135,6 +153,10 @@ iterator getValidatorIndices(voluntary_exit: SignedVoluntaryExit): uint64 =
 iterator getValidatorIndices(
     bls_to_execution_change: SignedBLSToExecutionChange): uint64 =
   yield bls_to_execution_change.message.validator_index
+
+iterator getValidatorIndices(
+    registration: SignedRandaoCommitmentRegistration): uint64 =
+  yield registration.message.validator_index
 
 func isSeen*(
     pool: ValidatorChangePool,
@@ -155,6 +177,11 @@ func isSeen*(pool: ValidatorChangePool, msg: SignedVoluntaryExit): bool =
 func isSeen*(pool: ValidatorChangePool, msg: SignedBLSToExecutionChange): bool =
   msg.message.validator_index in
     pool.prior_seen_bls_to_execution_change_indices
+
+func isSeen*(
+    pool: ValidatorChangePool, msg: SignedRandaoCommitmentRegistration): bool =
+  msg.message.validator_index in
+    pool.prior_seen_randao_commitment_registration_indices
 
 func addMessage*(
     pool: var ValidatorChangePool,
@@ -200,6 +227,20 @@ func addMessage*(
   else:
     addMessageAux(pool.bls_to_execution_changes_gossip)
 
+func addMessage*(
+    pool: var ValidatorChangePool, msg: SignedRandaoCommitmentRegistration,
+    localPriorityMessage: bool) =
+  pool.prior_seen_randao_commitment_registration_indices.incl(
+    msg.message.validator_index)
+  template addMessageAux(subpool) =
+    addValidatorChangeMessage(
+      subpool, pool.prior_seen_randao_commitment_registration_indices, msg,
+      RANDAO_COMMITMENT_REGISTRATIONS_BOUND)
+  if localPriorityMessage:
+    addMessageAux(pool.randao_commitment_registrations_api)
+  else:
+    addMessageAux(pool.randao_commitment_registrations_gossip)
+
 proc validateValidatorChangeMessage(
     _: RuntimeConfig, state: ForkyBeaconState, msg: ProposerSlashing): bool =
   check_proposer_slashing(state, msg, {}).isOk
@@ -215,6 +256,23 @@ proc validateValidatorChangeMessage(
     cfg: RuntimeConfig, state: ForkyBeaconState,
     msg: SignedBLSToExecutionChange): bool =
   check_bls_to_execution_change(cfg.GENESIS_FORK_VERSION, state, msg, {}).isOk
+proc validateValidatorChangeMessage(
+    _: RuntimeConfig, state: ForkyBeaconState,
+    msg: SignedRandaoCommitmentRegistration): bool =
+  when typeof(state).kind >= ConsensusFork.Eip8321:
+    let index = msg.message.validator_index
+    if index >= state.validators.lenu64:
+      return false
+    if msg.message.commitment == default(Eth2Digest):
+      return false
+    if state.randao_commitments.item(index) != default(Eth2Digest):
+      return false
+    for pending in state.pending_randao_commitments:
+      if pending.validator_index == index:
+        return false
+    true
+  else:
+    false
 
 proc getValidatorChangeMessagesForBlock(
     subpool: var Deque, cfg: RuntimeConfig, state: ForkyBeaconState,
@@ -258,7 +316,7 @@ proc getValidatorChangeMessagesForBlock(
 proc getBeaconBlockValidatorChanges*(
     pool: var ValidatorChangePool, cfg: RuntimeConfig,
     state: electra.BeaconState | fulu.BeaconState | gloas.BeaconState |
-           heze.BeaconState):
+           heze.BeaconState | eip8321.BeaconState):
     BeaconBlockValidatorChanges =
   var res: BeaconBlockValidatorChanges
 
@@ -287,4 +345,19 @@ proc getBeaconBlockValidatorChanges*(
         pool.bls_to_execution_changes_gossip, cfg, state, indices,
         res.bls_to_execution_changes, MAX_BLS_TO_EXECUTION_CHANGES)
 
+  res
+
+proc getRandaoCommitmentRegistrationsForBlock*(
+    pool: var ValidatorChangePool, cfg: RuntimeConfig,
+    state: eip8321.BeaconState): seq[SignedRandaoCommitmentRegistration] =
+  var
+    res: seq[SignedRandaoCommitmentRegistration]
+    indices: HashSet[uint64]
+  # Prioritize those from API
+  getValidatorChangeMessagesForBlock(
+    pool.randao_commitment_registrations_api, cfg, state, indices,
+    res, MAX_RANDAO_COMMITMENT_REGISTRATIONS)
+  getValidatorChangeMessagesForBlock(
+    pool.randao_commitment_registrations_gossip, cfg, state, indices,
+    res, MAX_RANDAO_COMMITMENT_REGISTRATIONS)
   res

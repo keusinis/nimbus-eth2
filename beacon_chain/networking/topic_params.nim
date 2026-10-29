@@ -381,6 +381,13 @@ func getBlsToExecutionChangeTopicParams*(timeParams: TimeParams): TopicParams =
     BlsToExecutionChangeWeight, messageRate, timeParams.epochsDuration(100),
     Opt.none(MeshMessageInfo))
 
+func getRandaoCommitmentRegistrationTopicParams*(
+    timeParams: TimeParams): TopicParams =
+  let messageRate = 1.0'f64 / 5.0'f64 / float64(SLOTS_PER_EPOCH)
+  timeParams.topicParams(
+    BlsToExecutionChangeWeight, messageRate, timeParams.epochsDuration(100),
+    Opt.none(MeshMessageInfo))
+
 func getExecutionPayloadBidTopicParams*(timeParams: TimeParams): TopicParams =
   const messageRate = 5.0'f64
   timeParams.topicParams(
