@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Status Research & Development GmbH
+# Licensed under either of
+#  * Apache License, version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+#    http://www.apache.org/licenses/LICENSE-2.0)
+#  * MIT license ([LICENSE-MIT](LICENSE-MIT) or
+#    http://opensource.org/licenses/MIT)
+# at your option. This file may not be copied, modified, or distributed except
+# according to those terms.
+
+participants_matrix:
+  el:
+    - el_type: ethrex
+      el_image: ethpandaops/ethrex:heze-devnet-2
+  cl:
+    - cl_type: nimbus
+      cl_image: ${NIMBUS_IMAGE}
+    # - cl_type: grandine
+    #   cl_image: ghcr.io/<owner>/grandine:eip8321
+    # - cl_type: lighthouse
+    #   cl_image: ghcr.io/<owner>/lighthouse:eip8321
+    # - cl_type: teku
+    #   cl_image: ghcr.io/<owner>/teku:eip8321
+    # - cl_type: lodestar
+    #   cl_image: ghcr.io/<owner>/lodestar:eip8321
+    # - cl_type: prysm
+    #   cl_image: ghcr.io/<owner>/prysm:eip8321
+  count: 2
+network_params:
+  fulu_fork_epoch: 0
+  gloas_fork_epoch: 1
+  heze_fork_epoch: 2
+ethereum_genesis_generator_params:
+  image: eip8321-genesis-generator
+  extra_env:
+    EIP8321_FORK_EPOCH: "${EIP8321_FORK_EPOCH}"
+    EIP8321_FORK_VERSION: "0xe8321000"
+additional_services:
+  - assertoor
+  - dora
+assertoor_params:
+  run_stability_check: true
+  run_block_proposal_check: true

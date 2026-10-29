@@ -433,6 +433,7 @@ proc proposeBlockAux(
     let commitment =
       state[].forky(fork).data.randao_commitments.item(validator_index)
     if not commitment.isZero:
+      validator.loadHashChain(node.config.validatorsDir())
       hash_chain_reveal = validator.hashChain.getHashChainReveal(
           commitment).valueOr:
         warn "No hash chain reveal available for RANDAO commitment",
