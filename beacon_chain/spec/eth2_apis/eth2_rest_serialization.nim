@@ -80,6 +80,7 @@ type
     SignedBuilderRequestAuth |
     gloas.SignedBeaconBlock |
     heze.SignedBeaconBlock |
+    eip8321.SignedBeaconBlock |
     SignedExecutionPayloadEnvelope |
     SignedExecutionPayloadEnvelopeContents
 
@@ -96,6 +97,7 @@ type
     seq[electra.SignedAggregateAndProof] |
     seq[gloas.SignedAggregateAndProof] |
     seq[PayloadAttestationMessage] |
+    seq[SignedRandaoCommitmentRegistration] |
     seq[SignedValidatorRegistrationV1] |
     seq[ValidatorIndex] |
     seq[RestBeaconCommitteeSelection] |
@@ -158,7 +160,9 @@ type
                     fulu.BlockContents | electra_mev.BlindedBeaconBlock |
                     fulu_mev.BlindedBeaconBlock |
                     gloas.BeaconBlock | heze.BeaconBlock |
-                    GloasProducedBlockContents | HezeProducedBlockContents
+                    eip8321.BeaconBlock |
+                    GloasProducedBlockContents | HezeProducedBlockContents |
+                    Eip8321ProducedBlockContents
 
 func ethHeaders(
     consensusFork: ConsensusFork,

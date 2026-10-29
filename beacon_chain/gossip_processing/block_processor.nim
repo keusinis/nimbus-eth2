@@ -298,6 +298,7 @@ proc storeSidecars(
 
 proc enqueuePayload*(self: ref BlockProcessor, blck: gloas.SignedBeaconBlock)
 proc enqueuePayload*(self: ref BlockProcessor, blck: heze.SignedBeaconBlock)
+proc enqueuePayload*(self: ref BlockProcessor, blck: eip8321.SignedBeaconBlock)
 
 proc storeBackfillBlock(
     self: ref BlockProcessor,
@@ -572,7 +573,7 @@ proc verifyPayloadOnCL(
     signedBlock: bellatrix.SignedBeaconBlock | capella.SignedBeaconBlock |
                  deneb.SignedBeaconBlock | electra.SignedBeaconBlock |
                  fulu.SignedBeaconBlock | gloas.SignedBeaconBlock |
-                 heze.SignedBeaconBlock,
+                 heze.SignedBeaconBlock | eip8321.SignedBeaconBlock,
     signedEnvelope: NoEnvelope | gloas.SignedExecutionPayloadEnvelope):
     Result[void, string] =
   const consensusFork = typeof(signedBlock).kind
@@ -638,7 +639,8 @@ proc verifyPayload(
 
 proc verifyPayload(
     self: ref BlockProcessor,
-    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+                 eip8321.SignedBeaconBlock,
     signedEnvelope: gloas.SignedExecutionPayloadEnvelope,
 ): Result[OptimisticStatus, PayloadVerifierError] =
   verifyPayloadOnCL(signedBlock, signedEnvelope).isOkOr:
@@ -1189,6 +1191,16 @@ proc addPayload*(
   debugHezeComment "stub: heze addPayload not yet implemented"
   ok()
 
+proc addPayload*(
+    self: ref BlockProcessor,
+    signedBlock: eip8321.SignedBeaconBlock,
+    signedEnvelope: gloas.SignedExecutionPayloadEnvelope,
+    sidecarsOpt: Opt[gloas.DataColumnSidecars],
+    maybeFinalized = false,
+): Future[Result[void, VerifierError]] {.async: (raises: [CancelledError]).} =
+  debugHezeComment "stub: eip8321 addPayload not yet implemented"
+  ok()
+
 proc enqueuePayload*(self: ref BlockProcessor, blck: gloas.SignedBeaconBlock) =
   ## Enqueue payload processing by block that is a valid block.
 
@@ -1219,6 +1231,9 @@ proc enqueuePayload*(self: ref BlockProcessor, blck: gloas.SignedBeaconBlock) =
 
 proc enqueuePayload*(self: ref BlockProcessor, blck: heze.SignedBeaconBlock) =
   debugHezeComment "stub: heze enqueuePayload not yet implemented"
+
+proc enqueuePayload*(self: ref BlockProcessor, blck: eip8321.SignedBeaconBlock) =
+  debugHezeComment "stub: eip8321 enqueuePayload not yet implemented"
 
 proc enqueuePayload*(self: ref BlockProcessor, blockRoot: Eth2Digest) =
   ## Enqueue payload processing by block root. If it is not a valid block, the

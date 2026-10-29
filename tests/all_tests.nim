@@ -17,6 +17,7 @@ import # Unit test
   ./test_attestation_pool,
   ./test_beacon_chain_db,
   ./test_beacon_time,
+  ./test_blake3,
   ./test_blockchain_dag,
   ./test_block_dag,
   ./test_block_processor,

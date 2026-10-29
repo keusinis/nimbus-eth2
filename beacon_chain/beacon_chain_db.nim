@@ -558,6 +558,10 @@ proc new*(T: type BeaconChainDB,
       if cfg.HEZE_FORK_EPOCH != FAR_FUTURE_EPOCH:
         kvStore db.openKvStore("321cd149fc98434fa315ce9afd563ad1").expectDb()
       else:
+        nil,
+      if cfg.EIP8321_FORK_EPOCH != FAR_FUTURE_EPOCH:
+        kvStore db.openKvStore("f6f76e57b8f74630a2f0edf94e8d8e72").expectDb()
+      else:
         nil
     ]
 
@@ -577,6 +581,10 @@ proc new*(T: type BeaconChainDB,
         nil,
       if cfg.HEZE_FORK_EPOCH != FAR_FUTURE_EPOCH:
         kvStore db.openKvStore("92859b2e460944169bcca68d8a620069").expectDb()
+      else:
+        nil,
+      if cfg.EIP8321_FORK_EPOCH != FAR_FUTURE_EPOCH:
+        kvStore db.openKvStore("ac26750cc4d94c6bbe2f94cb8a42883f").expectDb()
       else:
         nil
     ]
@@ -626,7 +634,8 @@ proc new*(T: type BeaconChainDB,
     if cfg.GLOAS_FORK_EPOCH != FAR_FUTURE_EPOCH:
       kvStore db.openKvStore("gloas_columns").expectDb()
     else: nil,
-    nil  # Heze
+    nil, # Heze
+    nil  # Eip8321
   ]
 
   var envelopes: KvStoreRef
@@ -1020,7 +1029,9 @@ proc updateImmutableValidators*(
       inc db.firstPostCapellaValidatorIndex
 
 template BeaconStateNoImmutableValidators(kind: static ConsensusFork): auto =
-  when kind == ConsensusFork.Heze:
+  when kind == ConsensusFork.Eip8321:
+    typedesc[Eip8321BeaconStateNoImmutableValidators]
+  elif kind == ConsensusFork.Heze:
     typedesc[HezeBeaconStateNoImmutableValidators]
   elif kind == ConsensusFork.Gloas:
     typedesc[GloasBeaconStateNoImmutableValidators]
@@ -1598,7 +1609,7 @@ iterator getAncestorSummaries*(db: BeaconChainDB, root: Eth2Digest):
     var found = false
     withAll(ConsensusFork):
       debugHezeComment "enable Heze block retrieval for backwards compat"
-      when consensusFork != ConsensusFork.Heze:
+      when consensusFork notin [ConsensusFork.Heze, ConsensusFork.Eip8321]:
         if not found:
           let blck = db.getBlock(res.root, consensusFork.TrustedSignedBeaconBlock)
           if blck.isSome:

@@ -326,7 +326,7 @@ proc getGasLimit*(self: ConsensusManager, pubkey: ValidatorPubKey): uint64 =
   getGasLimit(self.validatorsDir, self.defaultGasLimit, pubkey)
 
 func pendingBuilderPayment(
-    state: gloas.BeaconState | heze.BeaconState
+    state: gloas.BeaconState | heze.BeaconState | eip8321.BeaconState
 ): Opt[BuilderPendingWithdrawal] =
   ## The `BuilderPendingPayment` from `process_execution_payload_bid`
   template bid: untyped = state.latest_execution_payload_bid

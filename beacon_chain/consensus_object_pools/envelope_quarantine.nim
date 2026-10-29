@@ -84,7 +84,8 @@ func addOrphan*(
 
 func popOrphan*(
     self: var EnvelopeQuarantine,
-    blck: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    blck: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+          eip8321.SignedBeaconBlock,
 ): Opt[SignedExecutionPayloadEnvelope] =
   let bidBuilder =
     blck.message.body.signed_execution_payload_bid.message.builder_index

@@ -19,7 +19,7 @@ import
   nimcrypto/utils as ncrutils,
   ../[conf, filepath, beacon_clock],
   ../networking/network_metadata,
-  ./validator_pool
+  ./[hash_chain, validator_pool]
 
 from std/terminal import
   ForegroundColor, Style, readPasswordFromStdin, getch, resetAttributes,
@@ -28,7 +28,7 @@ from std/wordwrap import wrapWords
 from zxcvbn import passwordEntropy
 
 export
-  keystore, validator_pool, crypto, rand, Web3SignerUrl
+  keystore, validator_pool, hash_chain, crypto, rand, Web3SignerUrl
 
 when defined(windows):
   import stew/[windows/acl]
@@ -1738,6 +1738,15 @@ proc getGloasBuilderConfig*(
     return err(error)
   ok(res)
 
+proc loadHashChain*(v: AttachedValidator, validatorsDir: string) =
+  if v.kind != ValidatorKind.Local or v.hashChain.len > 0:
+    return
+  let secret = loadHashChainSecret(validatorsDir, v.pubkey).valueOr:
+    return
+  v.hashChain = compute_hash_chain(secret, HashChainLength).valueOr:
+    warn "Invalid hash chain secret", pubkey = v.pubkey
+    return
+
 proc addValidator*(
     host: KeymanagerHost, keystore: KeystoreData,
     withdrawalAddress: Opt[Eth1Address]) =
@@ -1747,6 +1756,7 @@ proc addValidator*(
     gasLimit = host.getSuggestedGasLimit(keystore.pubkey).valueOr(
       host.defaultGasLimit)
     v = host.validatorPool[].addValidator(keystore, feeRecipient, gasLimit)
+  v.loadHashChain(host.validatorsDir)
 
   if not isNil(host.getValidatorAndIdxFn):
     let data = host.getValidatorAndIdxFn(keystore.pubkey)

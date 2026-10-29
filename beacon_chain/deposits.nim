@@ -30,15 +30,48 @@ type
     of ValidatorStorageKind.Identifier:
       ident: ValidatorIdent
 
-static: doAssert(high(ConsensusFork) == ConsensusFork.Heze,
+static: doAssert(high(ConsensusFork) == ConsensusFork.Eip8321,
           "Update OptionalForks constant!")
 const
-  OptionalForks* = {ConsensusFork.Gloas, ConsensusFork.Heze}
+  OptionalForks* = {ConsensusFork.Gloas, ConsensusFork.Heze, ConsensusFork.Eip8321}
     ## When a new ConsensusFork is added and before this fork is activated on
     ## `mainnet`, it should be part of `OptionalForks`.
     ## In this case, the client will ignore missing <FORKNAME>_VERSION
     ## and <FORKNAME>_EPOCH constants from the data reported by BN via
     ## `/eth/v1/config/spec` API call.
+
+proc getSigningKey(
+       config: BeaconNodeConf,
+       storage: ValidatorStorage,
+       validatorKeyAsStr: string
+     ): ValidatorPrivKey =
+  case storage.kind
+  of ValidatorStorageKind.Identifier:
+    let
+      validatorsDir = config.validatorsDir
+      keystoreDir = validatorsDir / validatorKeyAsStr
+
+    if not dirExists(keystoreDir):
+      echo "The validator keystores directory '" & validatorsDir &
+           "' does not contain a keystore for the selected validator " &
+           "with public key '" & validatorKeyAsStr & "'."
+      quit 1
+
+    let signingItem = loadKeystore(
+      validatorsDir,
+      config.secretsDir,
+      validatorKeyAsStr,
+      config.nonInteractive,
+      nil)
+
+    if signingItem.isNone:
+      fatal "Unable to continue without decrypted signing key"
+      quit 1
+
+    signingItem.get().privateKey
+
+  of ValidatorStorageKind.Keystore:
+    storage.privateKey
 
 proc getSignedExitMessage(
        config: BeaconNodeConf,
@@ -50,34 +83,7 @@ proc getSignedExitMessage(
        genesis_validators_root: Eth2Digest
      ): SignedVoluntaryExit =
 
-  let signingKey =
-    case storage.kind
-    of ValidatorStorageKind.Identifier:
-      let
-        validatorsDir = config.validatorsDir
-        keystoreDir = validatorsDir / validatorKeyAsStr
-
-      if not dirExists(keystoreDir):
-        echo "The validator keystores directory '" & validatorsDir &
-             "' does not contain a keystore for the selected validator " &
-             "with public key '" & validatorKeyAsStr & "'."
-        quit 1
-
-      let signingItem = loadKeystore(
-        validatorsDir,
-        config.secretsDir,
-        validatorKeyAsStr,
-        config.nonInteractive,
-        nil)
-
-      if signingItem.isNone:
-        fatal "Unable to continue without decrypted signing key"
-        quit 1
-
-      signingItem.get().privateKey
-
-    of ValidatorStorageKind.Keystore:
-      storage.privateKey
+  let signingKey = getSigningKey(config, storage, validatorKeyAsStr)
 
   var signedExit = SignedVoluntaryExit(
     message: VoluntaryExit(
@@ -372,6 +378,152 @@ proc restValidatorExit(config: BeaconNodeConf) {.async.} =
 proc handleValidatorExitCommand(config: BeaconNodeConf) {.async.} =
   await restValidatorExit(config)
 
+proc restRegisterRandaoCommitment(
+    config: BeaconNodeConf, rng: var HmacDrbgContext) {.
+    raises: [CatchableError].} =
+  let
+    client =
+      block:
+        let
+          flags = {RestClientFlag.CommaSeparatedArray,
+                   RestClientFlag.ResolveAlways}
+          socketFlags = {SocketFlags.TcpNoDelay}
+
+        RestClientRef.new(config.restUrlForRegistration, flags = flags,
+                          socketFlags = socketFlags).valueOr:
+          raise (ref RestError)(msg: $error)
+
+    stateIdHead = StateIdent(kind: StateQueryKind.Named,
+                             value: StateIdentType.Head)
+
+  var validators: seq[ValidatorStorage]
+  if config.registerAllValidatorsFlag:
+    let keystoreCache = KeystoreCacheRef.init()
+    for keystore in listLoadableKeystores(config, keystoreCache):
+      validators.add ValidatorStorage(kind: ValidatorStorageKind.Keystore,
+                                      privateKey: keystore.privateKey)
+  else:
+    var decryptor: MultipleKeystoresDecryptor
+    defer: dispose decryptor
+    for pubkey in config.registerValidators:
+      let validatorStorage = decryptor.getValidator(pubkey).valueOr:
+        fatal "Incorrect validator index, key or keystore path specified",
+              value = pubkey, reason = error
+        quit 1
+      validators.add validatorStorage
+
+  let genesis = try:
+    let response = waitFor client.getGenesisPlain()
+    if response.status == 200:
+      let genesis = decodeBytes(GetGenesisResponse,
+                                response.data,
+                                response.contentType)
+      if genesis.isErr():
+        raise newException(RestError, $genesis.error)
+      genesis.get().data
+    else:
+      raiseGenericError(response)
+  except CatchableError as exc:
+    fatal "Failed to obtain the genesis validators root of the network",
+           reason = exc.msg
+    quit 1
+
+  if config.eth2Network.isNone:
+    fatal "Please specify the intended network for the registrations"
+    quit 1
+  let
+    cfg = config.loadEth2Network().cfg
+    genesis_validators_root = genesis.genesis_validators_root
+    validatorsDir = config.validatorsDir
+
+  var hadErrors = false
+  for validator in validators:
+    let restValidator = try:
+      let response = waitFor client.getStateValidatorPlain(
+        stateIdHead, validator.getIdent)
+      if response.status == 200:
+        let validatorInfo = decodeBytes(GetStateValidatorResponse,
+                                        response.data, response.contentType)
+        if validatorInfo.isErr():
+          raise newException(RestError, $validatorInfo.error)
+        validatorInfo.get().data
+      else:
+        raiseGenericError(response)
+    except CatchableError as exc:
+      fatal "Failed to obtain information for validator", reason = exc.msg
+      quit 1
+
+    let
+      validatorIdx = restValidator.index.uint64
+      validatorKey = restValidator.validator.pubkey
+      validatorKeyAsStr = "0x" & $validatorKey
+      validatorDesc = $validatorIdx & "(" & validatorKeyAsStr[0..9] & ")"
+      signingKey = getSigningKey(config, validator, validatorKeyAsStr)
+
+    var chain: seq[Eth2Digest]
+    let existing = loadHashChainSecret(validatorsDir, validatorKey)
+    if existing.isSome:
+      chain = compute_hash_chain(existing.get, HashChainLength).valueOr:
+        fatal "Stored hash chain secret produces a zero link",
+              validator = validatorDesc
+        quit 1
+    else:
+      var secret: Eth2Digest
+      while true:
+        secret = generateHashChainSecret(rng)
+        let res = compute_hash_chain(secret, HashChainLength)
+        if res.isSome:
+          chain = res.get
+          break
+      saveHashChainSecret(validatorsDir, validatorKey, secret).isOkOr:
+        fatal "Failed to save hash chain secret",
+              validator = validatorDesc, reason = error
+        quit 1
+
+    let
+      message = RandaoCommitmentRegistration(
+        validator_index: validatorIdx, commitment: chain[^1])
+      signedRegistration = SignedRandaoCommitmentRegistration(
+        message: message,
+        signature: get_randao_commitment_registration_signature(
+          cfg.GENESIS_FORK_VERSION, genesis_validators_root, message,
+          signingKey).toValidatorSig())
+
+    if config.printRegistrationData:
+      echo RestJson.encode(signedRegistration)
+    else:
+      try:
+        let
+          response = waitFor client.submitPoolRandaoCommitmentRegistration(
+            @[signedRegistration])
+          success = response.status == 200
+        if success:
+          echo "Successfully published RANDAO commitment registration for " &
+               "validator " & validatorDesc & "."
+        else:
+          hadErrors = true
+          let responseError = try:
+            RestJson.decode(response.data, RestErrorMessage)
+          except CatchableError as exc:
+            error "Failed to decode invalid error server response on " &
+                  "`submitPoolRandaoCommitmentRegistration` request",
+                  reason = exc.msg
+            continue
+
+          echo "The RANDAO commitment registration for validator " &
+               validatorDesc & " was not submitted successfully."
+          echo responseError.message & ":"
+          for el in responseError.stacktraces.get():
+            echo el
+          echoP "Please try again."
+      except CatchableError as err:
+        fatal "Failed to send the signed registration message",
+              signedRegistration, reason = err.msg
+        hadErrors = true
+
+  if hadErrors:
+    quit 1
+
 proc doDeposits*(config: BeaconNodeConf, rng: var HmacDrbgContext) {.
     raises: [CatchableError].} =
   case config.depositsCmd
@@ -482,3 +634,6 @@ proc doDeposits*(config: BeaconNodeConf, rng: var HmacDrbgContext) {.
 
   of DepositsCmd.exit:
     waitFor handleValidatorExitCommand(config)
+
+  of DepositsCmd.registerRandaoCommitment:
+    restRegisterRandaoCommitment(config, rng)

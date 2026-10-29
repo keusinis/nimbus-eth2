@@ -225,3 +225,4 @@ suite "EF - BPO forkdigests":
       forkDigests(ConsensusFork.Fulu, forkDigests).countIt(true) == 0
       forkDigests(ConsensusFork.Gloas, forkDigests).countIt(true) == 1
       forkDigests(ConsensusFork.Heze, forkDigests).countIt(true) == 0
+      forkDigests(ConsensusFork.Eip8321, forkDigests).countIt(true) == 0

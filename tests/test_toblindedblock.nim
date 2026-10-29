@@ -164,4 +164,4 @@ suite "Blinded block conversions":
           electra_steps
         when consensusFork >= ConsensusFork.Fulu:
           fulu_steps
-        static: doAssert high(ConsensusFork) == ConsensusFork.Heze
+        static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321

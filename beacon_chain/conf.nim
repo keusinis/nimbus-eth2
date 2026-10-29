@@ -82,6 +82,7 @@ type
     `import` = "Imports password-protected keystores interactively"
     # status   = "Displays status information about all deposits"
     exit     = "Submits a validator voluntary exit"
+    registerRandaoCommitment = "Generates a hash chain and submits a RANDAO commitment registration"
 
   SNStartUpCmd* {.pure.} = enum
     SNNoCommand
@@ -835,6 +836,28 @@ type
 
         printData* {.
           desc: "Print signed exit message instead of publishing it"
+          defaultValue: false
+          name: "print" .}: bool
+
+      of DepositsCmd.registerRandaoCommitment:
+        registerValidators* {.
+          desc: "One or more validator index, public key or a keystore path of " &
+                "the validator(s) to register"
+          name: "validator" .}: seq[string]
+
+        registerAllValidatorsFlag* {.
+          desc: "Register all validators in the specified data directory or validators directory"
+          defaultValue: false
+          name: "all" .}: bool
+
+        restUrlForRegistration* {.
+          desc: "URL of the beacon node REST service"
+          defaultValue: defaultBeaconNode
+          defaultValueDesc: $defaultBeaconNodeDesc
+          name: "rest-url" .}: string
+
+        printRegistrationData* {.
+          desc: "Print signed registration message instead of publishing it"
           defaultValue: false
           name: "print" .}: bool
 

@@ -521,7 +521,7 @@ iterator getBlockIds*(
     # definition is consistent
     debugHezeComment "actually do this"
     case db.cfg.consensusForkAtEpoch(slot.epoch)
-    of ConsensusFork.Phase0 .. ConsensusFork.Heze:
+    of ConsensusFork.Phase0 .. ConsensusFork.Eip8321:
       let stateSlot = (slot.era() + 1).start_slot()
       if not getPartialState(
           db, historical_roots, historical_summaries, stateSlot, state[]):

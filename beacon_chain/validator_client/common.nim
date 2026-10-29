@@ -49,10 +49,10 @@ const
 
   ZeroTimeDiff* = TimeDiff(nanoseconds: 0'i64)
 
-static: doAssert(high(ConsensusFork) == ConsensusFork.Heze,
+static: doAssert(high(ConsensusFork) == ConsensusFork.Eip8321,
           "Update OptionalForks constant!")
 const
-  OptionalForks* = {ConsensusFork.Gloas, ConsensusFork.Heze}
+  OptionalForks* = {ConsensusFork.Gloas, ConsensusFork.Heze, ConsensusFork.Eip8321}
     ## When a new ConsensusFork is added and before this fork is activated on
     ## `mainnet`, it should be part of `OptionalForks`.
     ## In this case, the client will ignore missing <FORKNAME>_VERSION

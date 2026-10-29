@@ -70,6 +70,12 @@ type
     messages: seq[GossipMessage]
 
 const SKIP = [
+  # Vector primes the `seen` set out of band; not reproducible from its files
+  "gossip_randao_commitment_registration__ignore_already_seen",
+  # Heze genesis state with Eip8321 scheduled later; test DAG is genesis-forked
+  "gossip_randao_commitment_registration__ignore_pre_eip8321_head_state",
+  # Synthetic state fork version 0xffffffff; test DAG rejects it as wrong network
+  "gossip_randao_commitment_registration__valid_post_eip8321_head_state",
   # Finalized checkpoint root that is not a known block
   "gossip_beacon_aggregate_and_proof__ignore_finalized_not_ancestor",
   "gossip_beacon_attestation__ignore_finalized_not_ancestor",
@@ -299,6 +305,15 @@ proc runGossipBlsToExecutionChange(
         batchCrypto, message, wallTime)):
     pool[].addMessage(message, localPriorityMessage = false)
 
+proc runGossipRandaoCommitmentRegistration(
+    suiteName: static string, path: string,
+    consensusFork: static ConsensusFork) =
+  gossipTest(
+      suiteName, path, consensusFork, SignedRandaoCommitmentRegistration,
+      await pool[].validateRandaoCommitmentRegistration(
+        batchCrypto, message, wallTime)):
+    pool[].addMessage(message, localPriorityMessage = false)
+
 proc runGossipAttesterSlashing(
     suiteName: static string, path: string,
     consensusFork: static ConsensusFork) =
@@ -503,6 +518,9 @@ gossipSuite(
 gossipSuite(
   "BLS To Execution Change", "gossip_bls_to_execution_change",
   runGossipBlsToExecutionChange)
+gossipSuite(
+  "RANDAO Commitment Registration", "gossip_randao_commitment_registration",
+  runGossipRandaoCommitmentRegistration)
 gossipSuite(
   "Sync Committee Message", "gossip_sync_committee_message",
   runGossipSyncCommitteeMessage)

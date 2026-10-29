@@ -283,6 +283,12 @@ const
     "Invalid BLS to execution change; it won't validate, so it's rejected"
   BlsToExecutionChangeValidationSuccess* =
     "BLS to execution change was broadcast"
+  InvalidRandaoCommitmentRegistrationObjectError* =
+    "Unable to decode RANDAO commitment registration object(s)"
+  RandaoCommitmentRegistrationValidationError* =
+    "Invalid RANDAO commitment registration; it won't validate, so it's rejected"
+  RandaoCommitmentRegistrationValidationSuccess* =
+    "RANDAO commitment registration was broadcast"
   AggregationSelectionNotImplemented* =
     "Attestation and sync committee aggreggation selection are not implemented"
   MissingMerkleProofError* =

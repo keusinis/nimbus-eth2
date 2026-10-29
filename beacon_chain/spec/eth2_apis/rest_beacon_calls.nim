@@ -24,7 +24,8 @@ type
     ElectraSignedBlockContents |
     FuluSignedBlockContents |
     gloas.SignedBeaconBlock |
-    heze.SignedBeaconBlock
+    heze.SignedBeaconBlock |
+    eip8321.SignedBeaconBlock
 
 proc getGenesis*(): RestResponse[GetGenesisResponse] {.
      rest, endpoint: "/eth/v1/beacon/genesis",
@@ -198,6 +199,13 @@ proc publishBlockV2(
 proc publishBlockV2(
     broadcast_validation: Option[BroadcastValidationType],
     body: heze.SignedBeaconBlock
+): RestPlainResponse {.rest, endpoint: "/eth/v2/beacon/blocks",
+   meth: MethodPost.}
+  ## https://ethereum.github.io/beacon-APIs/#/Beacon/publishBlockV2
+
+proc publishBlockV2(
+    broadcast_validation: Option[BroadcastValidationType],
+    body: eip8321.SignedBeaconBlock
 ): RestPlainResponse {.rest, endpoint: "/eth/v2/beacon/blocks",
    meth: MethodPost.}
   ## https://ethereum.github.io/beacon-APIs/#/Beacon/publishBlockV2
@@ -451,6 +459,11 @@ proc submitPoolVoluntaryExit*(body: SignedVoluntaryExit): RestPlainResponse {.
      rest, endpoint: "/eth/v1/beacon/pool/voluntary_exits",
      meth: MethodPost.}
   ## https://ethereum.github.io/beacon-APIs/#/Beacon/submitPoolVoluntaryExit
+
+proc submitPoolRandaoCommitmentRegistration*(
+       body: seq[SignedRandaoCommitmentRegistration]): RestPlainResponse {.
+     rest, endpoint: "/eth/v1/beacon/pool/randao_commitment_registrations",
+     meth: MethodPost.}
 
 proc getSignedExecutionPayloadEnvelopePlain*(
        block_id: BlockIdent): RestPlainResponse {.

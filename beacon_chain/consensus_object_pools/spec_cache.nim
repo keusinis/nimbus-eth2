@@ -233,7 +233,7 @@ func is_aggregator*(shufflingRef: ShufflingRef, slot: Slot,
   return is_aggregator(committee_len, slot_signature)
 
 iterator get_ptc*(
-  state: gloas.BeaconState | heze.BeaconState,
+  state: gloas.BeaconState | heze.BeaconState | eip8321.BeaconState,
   shufflingRef: ShufflingRef, slot: Slot):
     ValidatorIndex {.closure.} =
   let epoch = slot.epoch()

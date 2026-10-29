@@ -347,6 +347,8 @@ func getVanityLogs(stdoutKind: StdoutLogKind): VanityLogs =
 func getVanityMascot(consensusFork: ConsensusFork): string =
   debugHezeComment "don't know vanity mascot yet"
   case consensusFork
+  of ConsensusFork.Eip8321:
+    "?"
   of ConsensusFork.Heze:
     "?"
   of ConsensusFork.Gloas:
@@ -1262,6 +1264,13 @@ proc addHezeMessageHandlers(
     getInclusionListTopic(forkDigest),
     getInclusionListTopicParams(node.dag.timeParams))
 
+proc addEip8321MessageHandlers(
+    node: BeaconNode, forkDigest: ForkDigest, slot: Slot) =
+  node.addHezeMessageHandlers(forkDigest, slot)
+  node.network.subscribe(
+    getRandaoCommitmentRegistrationTopic(forkDigest),
+    getRandaoCommitmentRegistrationTopicParams(node.dag.timeParams))
+
 proc removeAltairMessageHandlers(node: BeaconNode, forkDigest: ForkDigest) =
   node.removePhase0MessageHandlers(forkDigest)
 
@@ -1298,6 +1307,10 @@ proc removeGloasMessageHandlers(node: BeaconNode, forkDigest: ForkDigest) =
 proc removeHezeMessageHandlers(node: BeaconNode, forkDigest: ForkDigest) =
   node.removeGloasMessageHandlers(forkDigest)
   node.network.unsubscribe(getInclusionListTopic(forkDigest))
+
+proc removeEip8321MessageHandlers(node: BeaconNode, forkDigest: ForkDigest) =
+  node.removeHezeMessageHandlers(forkDigest)
+  node.network.unsubscribe(getRandaoCommitmentRegistrationTopic(forkDigest))
 
 proc updateSyncCommitteeTopics(node: BeaconNode, slot: Slot) =
   template lastSyncUpdate: untyped =
@@ -1396,7 +1409,7 @@ proc updateGossipStatus(node: BeaconNode, slot: Slot) {.async.} =
     TOPIC_SUBSCRIBE_THRESHOLD_SLOTS = 64
     HYSTERESIS_BUFFER = 16
 
-  static: doAssert high(ConsensusFork) == ConsensusFork.Heze
+  static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321
 
   let
     head = node.dag.head
@@ -1470,7 +1483,8 @@ proc updateGossipStatus(node: BeaconNode, slot: Slot) {.async.} =
     removeCapellaMessageHandlers,  # electra (capella handlers, different forkDigest)
     removeFuluMessageHandlers,
     removeGloasMessageHandlers,
-    removeHezeMessageHandlers
+    removeHezeMessageHandlers,
+    removeEip8321MessageHandlers
   ]
 
   for gossipEpoch in oldGossipEpochs:
@@ -1487,7 +1501,8 @@ proc updateGossipStatus(node: BeaconNode, slot: Slot) {.async.} =
     addCapellaMessageHandlers,  # electra (capella handlers, different forkDigest)
     addFuluMessageHandlers,
     addGloasMessageHandlers,
-    addHezeMessageHandlers
+    addHezeMessageHandlers,
+    addEip8321MessageHandlers
   ]
 
   for gossipEpoch in newGossipEpochs:
@@ -2073,6 +2088,19 @@ proc installMessageValidators(node: BeaconNode) =
                 return toValidationResult(
                   await node.processor.processSignedInclusionList(
                     MsgSource.gossip, signedInclusionList)))
+
+          # randao_commitment_registration
+          # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/p2p-interface.md#randao_commitment_registration
+          when consensusFork >= ConsensusFork.Eip8321:
+            node.network.addAsyncValidator(
+              getRandaoCommitmentRegistrationTopic(digest), proc (
+                msg: SignedRandaoCommitmentRegistration,
+                src: PeerId
+              ): Future[ValidationResult] {.
+                   async: (raises: [CancelledError]).} =
+                return toValidationResult(
+                  await node.processor.processRandaoCommitmentRegistration(
+                    MsgSource.gossip, msg)))
 
           # beacon_attestation_{subnet_id}
           # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.0/specs/electra/p2p-interface.md#modified-beacon_attestation_subnet_id

@@ -930,6 +930,7 @@ template gossipMaxSize(cfg: RuntimeConfig, T: untyped): uint32 =
   # have lists bounded at MAX_VALIDATORS_PER_COMMITTEE (2048) items, thus
   # having max sizes significantly smaller than MAX_PAYLOAD_SIZE.
   elif T is gloas.SignedBeaconBlock or T is heze.SignedBeaconBlock or
+       T is eip8321.SignedBeaconBlock or
        T is phase0.Attestation or T is phase0.AttesterSlashing or
        T is phase0.SignedAggregateAndProof or T is phase0.SignedBeaconBlock or
        T is electra.SignedAggregateAndProof or T is electra.Attestation or
@@ -2990,6 +2991,13 @@ proc broadcastBlsToExecutionChange*(
   let topic = getBlsToExecutionChangeTopic(
     node.forkDigestAtEpoch(node.getWallEpoch))
   node.broadcast(topic, bls_to_execution_change)
+
+proc broadcastRandaoCommitmentRegistration*(
+    node: Eth2Node, registration: SignedRandaoCommitmentRegistration):
+    Future[SendResult] {.async: (raises: [CancelledError], raw: true).} =
+  let topic = getRandaoCommitmentRegistrationTopic(
+    node.forkDigestAtEpoch(node.getWallEpoch))
+  node.broadcast(topic, registration)
 
 proc broadcastAggregateAndProof*(
     node: Eth2Node,

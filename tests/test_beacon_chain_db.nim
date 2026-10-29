@@ -132,7 +132,7 @@ let
       res[consensusFork] = cfg.getTestStates(consensusFork)
     res
 debugHezeComment "..."
-doAssert testStates.toOpenArray(0, testStates.len - 2).allIt(it.len > 8)
+doAssert testStates.toOpenArray(0, testStates.len - 3).allIt(it.len > 8)
 
 suite "Beacon chain DB" & preset():
   test "empty database" & preset():

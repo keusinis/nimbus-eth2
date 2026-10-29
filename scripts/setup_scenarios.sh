@@ -36,6 +36,17 @@ if [[ -n "${CACHE_DIR}" ]]; then
 fi
 
 pushd "${SUBREPO_DIR}"
-./download_test_vectors.sh
+# EIP-8321 vectors are on a consensus-specs fork
+EIP8321_VERSION="v1.7.0-eip8321.1"
+mkdir -p "tarballs/${EIP8321_VERSION}"
+for flavour in general minimal mainnet; do
+	f="tarballs/${EIP8321_VERSION}/${flavour}.tar.gz"
+	if [[ ! -e "$f" ]]; then
+		curl --location --fail --show-error --retry 3 --retry-all-errors --output "$f.part" \
+			"https://github.com/lukassta/consensus-specs/releases/download/${EIP8321_VERSION}/${flavour}.tar.gz"
+		mv "$f.part" "$f"
+	fi
+done
+CONSENSUS_TEST_VECTOR_VERSIONS="${EIP8321_VERSION}" ./download_test_vectors.sh
 ./download_slashing_interchange_tests.sh
 popd

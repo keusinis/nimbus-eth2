@@ -247,7 +247,7 @@ when IsGnosisSupported:
       checkConfigConsistency(network.cfg)
       doAssert network.cfg.FULU_FORK_EPOCH < FAR_FUTURE_EPOCH
       doAssert network.cfg.GLOAS_FORK_EPOCH == FAR_FUTURE_EPOCH
-      doAssert ConsensusFork.high == ConsensusFork.Heze
+      doAssert ConsensusFork.high == ConsensusFork.Eip8321
       doAssert network.cfg.BLOB_SCHEDULE.len == 0
 
 elif IsMainnetSupported:
@@ -335,7 +335,7 @@ elif IsMainnetSupported:
         digest: Eth2Digest.fromHex "0x2683ebc120f91f740c7bed4c866672d01e1ba51b4cc360297138465ee5df40f0"))
 
   static:
-    doAssert ConsensusFork.high == ConsensusFork.Heze
+    doAssert ConsensusFork.high == ConsensusFork.Eip8321
     for network in [mainnetMetadata, sepoliaMetadata, hoodiMetadata]:
       checkConfigConsistency(network.cfg)
       doAssert network.cfg.BLOB_SCHEDULE.len == 2
@@ -347,10 +347,12 @@ elif IsMainnetSupported:
     for network in [sepoliaMetadata]:
       doAssert network.cfg.GLOAS_FORK_EPOCH < FAR_FUTURE_EPOCH
       doAssert network.cfg.HEZE_FORK_EPOCH == FAR_FUTURE_EPOCH
+      doAssert network.cfg.EIP8321_FORK_EPOCH == FAR_FUTURE_EPOCH
 
     checkConfigConsistency(platabergetMetadata.cfg)
     doAssert platabergetMetadata.cfg.GLOAS_FORK_EPOCH < FAR_FUTURE_EPOCH
     doAssert platabergetMetadata.cfg.HEZE_FORK_EPOCH == FAR_FUTURE_EPOCH
+    doAssert platabergetMetadata.cfg.EIP8321_FORK_EPOCH == FAR_FUTURE_EPOCH
     doAssert platabergetMetadata.cfg.BLOB_SCHEDULE.len == 1
 
 proc getMetadataForNetwork*(networkName: string): Eth2NetworkMetadata =

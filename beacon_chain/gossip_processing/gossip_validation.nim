@@ -565,7 +565,8 @@ template validateBeaconBlockPerFork(
     dag: ChainDAGRef,
     quarantine: ref Quarantine,
     envelopeQuarantine: ref EnvelopeQuarantine,
-    signed_beacon_block: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    signed_beacon_block: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+                         eip8321.SignedBeaconBlock,
     parent: BlockRef): untyped =
   template blck: untyped = signed_beacon_block.message
   template bid: untyped = blck.body.signed_execution_payload_bid.message
@@ -1400,6 +1401,53 @@ proc validateBlsToExecutionChange*(
   # Send notification about new BLS to execution change via callback
   if not(isNil(pool.onBLSToExecutionChangeReceived)):
     pool.onBLSToExecutionChangeReceived(signed_address_change)
+
+  return ok()
+
+# https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/p2p-interface.md#randao_commitment_registration
+proc validateRandaoCommitmentRegistration*(
+    pool: ValidatorChangePool, batchCrypto: ref BatchCrypto,
+    registration: SignedRandaoCommitmentRegistration,
+    wallTime: BeaconTime
+): Future[Result[void, ValidationError]] {.async: (raises: [CancelledError]).} =
+  # [IGNORE] This is the first valid randao_commitment_registration received
+  # for the validator
+  if pool.isSeen(registration):
+    return errIgnore(
+      "SignedRandaoCommitmentRegistration: already seen registration for this validator")
+
+  # [IGNORE] The head state fork version is at or after EIP8321_FORK_VERSION
+  # [REJECT] The validator index is valid
+  # [REJECT] The commitment is not zero
+  # [IGNORE] The validator has no registered commitment
+  # [IGNORE] The validator has no pending commitment
+  # [REJECT] The signature is valid
+  withState(pool.dag.headState):
+    when consensusFork < ConsensusFork.Eip8321:
+      return errIgnore(
+        "SignedRandaoCommitmentRegistration: can't validate against pre-Eip8321 state")
+    else:
+      let index = registration.message.validator_index
+      if index >= forkyState.data.validators.lenu64:
+        return pool.checkedReject(
+          "SignedRandaoCommitmentRegistration: validator index out of range")
+      if registration.message.commitment == default(Eth2Digest):
+        return pool.checkedReject(
+          "SignedRandaoCommitmentRegistration: zero commitment")
+      if forkyState.data.randao_commitments.item(index) != default(Eth2Digest):
+        return errIgnore(
+          "SignedRandaoCommitmentRegistration: commitment already registered")
+      for pending in forkyState.data.pending_randao_commitments:
+        if pending.validator_index == index:
+          return errIgnore(
+            "SignedRandaoCommitmentRegistration: commitment already pending")
+      if not verify_randao_commitment_registration_signature(
+          pool.dag.cfg.GENESIS_FORK_VERSION,
+          forkyState.data.genesis_validators_root, registration,
+          forkyState.data.validators.item(index).pubkey,
+          registration.signature):
+        return pool.checkedReject(
+          "SignedRandaoCommitmentRegistration: invalid signature")
 
   return ok()
 

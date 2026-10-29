@@ -360,7 +360,7 @@ func is_merge_transition_complete*(
   state.latest_execution_payload_header != defaultExecutionPayloadHeader
 
 func is_merge_transition_complete*(
-    state: gloas.BeaconState | heze.BeaconState): bool =
+    state: gloas.BeaconState | heze.BeaconState | eip8321.BeaconState): bool =
   not state.latest_block_hash.isZero
 
 # https://github.com/ethereum/consensus-specs/blob/v1.5.0-alpha.9/sync/optimistic.md#helpers

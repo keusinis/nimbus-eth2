@@ -315,12 +315,19 @@ proc makeEngineBlock*(
     verification_flags: UpdateFlags,
     builderBid: Opt[gloas.SignedExecutionPayloadBid] = Opt.none(
       gloas.SignedExecutionPayloadBid),
+    hash_chain_reveal: Eth2Digest = default(Eth2Digest),
 ): EngineBlockResult[consensusFork.BeaconBlock, consensusFork.BlobsBundle] =
   let
     attestations = node.attestationPool[].getAttestationsForBlock(state, cache)
     exits = node.validatorChangePool[].getBeaconBlockValidatorChanges(
       node.dag.cfg, state.data
     )
+    randao_commitment_registrations =
+      when consensusFork >= ConsensusFork.Eip8321:
+        node.validatorChangePool[].getRandaoCommitmentRegistrationsForBlock(
+          node.dag.cfg, state.data)
+      else:
+        default(seq[SignedRandaoCommitmentRegistration])
     sync_aggregate = node.syncCommitteeMsgPool[].produceSyncAggregate(head.bid, slot)
     signed_execution_payload_bid =
       when consensusFork >= ConsensusFork.Heze:
@@ -361,6 +368,8 @@ proc makeEngineBlock*(
       signed_execution_payload_bid,
       payload_attestations,
       parent_execution_requests,
+      randao_commitment_registrations,
+      hash_chain_reveal,
     ).valueOr:
       # This is almost certainly a bug, but it's complex enough that there's a
       # small risk it might happen even when most proposals succeed - thus we
@@ -691,12 +700,19 @@ proc makeBuilderBlock*(
     head: BlockRef,
     slot: Slot,
     builderBid: ForkyBuilderBid,
+    hash_chain_reveal: Eth2Digest = default(Eth2Digest),
 ): BuilderBlockResult[consensusFork.BlindedBeaconBlock] =
   let
     attestations = node.attestationPool[].getAttestationsForBlock(state, cache)
     exits = node.validatorChangePool[].getBeaconBlockValidatorChanges(
       node.dag.cfg, state.data
     )
+    randao_commitment_registrations =
+      when consensusFork >= ConsensusFork.Eip8321:
+        node.validatorChangePool[].getRandaoCommitmentRegistrationsForBlock(
+          node.dag.cfg, state.data)
+      else:
+        default(seq[SignedRandaoCommitmentRegistration])
     sync_aggregate = node.syncCommitteeMsgPool[].produceSyncAggregate(head.bid, slot)
 
   const
@@ -724,6 +740,8 @@ proc makeBuilderBlock*(
       builderBid.execution_requests,
       signed_execution_payload_bid,
       payload_attestations,
+      randao_commitment_registrations = randao_commitment_registrations,
+      hash_chain_reveal = hash_chain_reveal,
     ).valueOr:
       # This is almost certainly a bug, but it's complex enough that there's a
       # small risk it might happen even when most proposals succeed - thus we
@@ -834,6 +852,7 @@ proc makeMaybeBlindedBeaconBlockForHeadAndSlot*(
     head: BlockRef,
     slot: Slot,
     builderBoostFactor: uint64,
+    hash_chain_reveal: Eth2Digest = default(Eth2Digest),
 ): Future[
     Result[
       tuple[
@@ -878,6 +897,7 @@ proc makeMaybeBlindedBeaconBlockForHeadAndSlot*(
       head,
       slot,
       bids.builderBid.value(),
+      hash_chain_reveal,
     ).valueOr:
       return err("Failed to create builder block")
 
@@ -907,6 +927,7 @@ proc makeMaybeBlindedBeaconBlockForHeadAndSlot*(
     bids.engineBid[].execution_requests,
     default(consensusFork.ExecutionRequests),
     {},
+    hash_chain_reveal = hash_chain_reveal,
   )
 
   ok(
@@ -1015,6 +1036,7 @@ proc makeBlockAndMaybeEnvelopeForHeadAndSlot*(
     head: BlockRef,
     slot: Slot,
     builderConfig: gloas_mev.BuilderConfig,
+    hash_chain_reveal: Eth2Digest = default(Eth2Digest),
 ): Future[
     Result[
       tuple[
@@ -1129,6 +1151,7 @@ proc makeBlockAndMaybeEnvelopeForHeadAndSlot*(
       parentExecutionRequests,
       verificationFlags,
       selectedBuilderBid,
+      hash_chain_reveal,
     ).valueOr:
       return err(error)
 
