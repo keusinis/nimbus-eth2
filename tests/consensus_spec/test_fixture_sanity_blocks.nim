@@ -94,7 +94,7 @@ template runForkBlockTests(consensusFork: static ConsensusFork) =
         "EF - " & forkName & " - Finality",
         FinalityDir, suiteName, path)
 
-  when consensusFork != ConsensusFork.Heze:
+  when consensusFork notin [ConsensusFork.Heze, ConsensusFork.Eip8321]:
     debugHezeComment "no random tests for Heze yet"
     suite "EF - " & forkName & " - Random " & preset():
       for kind, path in walkDir(RandomDir, relative = true, checkDir = true):

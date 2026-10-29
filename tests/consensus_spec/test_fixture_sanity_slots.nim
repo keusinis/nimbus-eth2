@@ -125,3 +125,12 @@ suite "EF - Heze - Sanity - Slots " & preset():
       sanitySlotsDir, relative = true, checkDir = true):
     runTest(
       heze.BeaconState, sanitySlotsDir, "Heze", suiteName, path)
+
+from ../../beacon_chain/spec/datatypes/eip8321 import BeaconState
+
+suite "EF - Eip8321 - Sanity - Slots " & preset():
+  const sanitySlotsDir = sanitySlotsDir("eip8321")
+  for kind, path in walkDir(
+      sanitySlotsDir, relative = true, checkDir = true):
+    runTest(
+      eip8321.BeaconState, sanitySlotsDir, "Eip8321", suiteName, path)

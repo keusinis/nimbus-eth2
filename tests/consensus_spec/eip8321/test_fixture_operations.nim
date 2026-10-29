@@ -1,0 +1,405 @@
+# beacon_chain
+# Copyright (c) 2026 Status Research & Development GmbH
+# Licensed and distributed under either of
+#   * MIT license (license terms in the root directory or at https://opensource.org/licenses/MIT).
+#   * Apache v2 license (license terms in the root directory or at https://www.apache.org/licenses/LICENSE-2.0).
+# at your option. This file may not be copied, modified, or distributed except according to those terms.
+
+{.push raises: [], gcsafe.}
+{.used.}
+
+import
+  # Utilities
+  chronicles,
+  unittest2,
+  # Beacon chain internals
+  ../../../beacon_chain/spec/state_transition_block,
+  ../../../beacon_chain/spec/datatypes/eip8321,
+  # Test utilities
+  ../../testutil,
+  ../fixtures_utils, ../os_ops,
+  ../../helpers/debug_state
+
+from std/sequtils import anyIt, mapIt, toSeq
+from ../../../beacon_chain/spec/beaconstate import
+  get_base_reward_per_increment, get_state_exit_queue_info,
+  get_total_active_balance, latest_block_root, process_attestation
+
+const
+  OpDir                       = SszTestsDir/const_preset/"eip8321"/"operations"
+  OpAttestationsDir           = OpDir/"attestation"
+  OpAttSlashingDir            = OpDir/"attester_slashing"
+  OpBlockHeaderDir            = OpDir/"block_header"
+  OpBlsToExecutionChangeDir   = OpDir/"bls_to_execution_change"
+  OpBuilderDepositRequestDir  = OpDir/"builder_deposit_request"
+  OpBuilderExitRequestDir     = OpDir/"builder_exit_request"
+  OpConsolidationRequestDir   = OpDir/"consolidation_request"
+  OpDepositRequestDir         = OpDir/"deposit_request"
+  OpWithdrawalRequestDir      = OpDir/"withdrawal_request"
+  OpParentExecutionPayloadDir = OpDir/"parent_execution_payload"
+  OpExecutionPayloadBidDir    = OpDir/"execution_payload_bid"
+  OpPayloadAttestationDir     = OpDir/"payload_attestation"
+  OpProposerSlashingDir       = OpDir/"proposer_slashing"
+  OpRandaoDir                 = OpDir/"randao"
+  OpRandaoCommitmentRegistrationDir = OpDir/"randao_commitment_registration"
+  OpSyncAggregateDir          = OpDir/"sync_aggregate"
+  OpVoluntaryExitDir          = OpDir/"voluntary_exit"
+  OpVoluntaryExitChurnDir     = OpDir/"voluntary_exit_churn"
+  OpWithdrawalsDir            = OpDir/"withdrawals"
+
+  baseDescription = "EF - Eip8321 - Operations - "
+
+const testDirs = toHashSet([
+  OpAttestationsDir, OpAttSlashingDir, OpBlockHeaderDir,
+  OpBlsToExecutionChangeDir, OpBuilderDepositRequestDir, OpBuilderExitRequestDir,
+  OpConsolidationRequestDir, OpDepositRequestDir,
+  OpWithdrawalRequestDir, OpParentExecutionPayloadDir,
+  OpExecutionPayloadBidDir, OpPayloadAttestationDir, OpProposerSlashingDir,
+  OpRandaoDir, OpRandaoCommitmentRegistrationDir,
+  OpSyncAggregateDir, OpVoluntaryExitDir, OpVoluntaryExitChurnDir,
+  OpWithdrawalsDir
+])
+
+doAssert toHashSet(
+  mapIt(toSeq(walkDir(OpDir, relative = false)), it.path)) == testDirs
+
+proc runTest[T, U](
+    testSuiteDir, suiteName, opName, applyFile: string,
+    applyProc: U, identifier: string) =
+  let testDir = testSuiteDir / "pyspec_tests" / identifier
+
+  let prefix =
+    if fileExists(testDir/"post.ssz_snappy"):
+      "[Valid]   "
+    else:
+      "[Invalid] "
+
+  test prefix & baseDescription & opName & " - " & identifier:
+    let preState = newClone(
+      parseTest(testDir/"pre.ssz_snappy", SSZ, eip8321.BeaconState))
+    let done =
+      when T is PayloadAttestation:
+        applyProc(
+          readRuntimeConfig(testDir/"config.yaml")[0], preState[],
+          parseTest(testDir/(applyFile & ".ssz_snappy"), SSZ, T))
+      else:
+        applyProc(
+          preState[], parseTest(testDir/(applyFile & ".ssz_snappy"), SSZ, T))
+
+    if fileExists(testDir/"post.ssz_snappy"):
+      let
+        postState = newClone(parseTest(
+          testDir/"post.ssz_snappy", SSZ, eip8321.BeaconState))
+        pass = preState[].hash_tree_root() == postState[].hash_tree_root()
+
+      # TODO reportDiff doesn't understand at least one of HashArray or
+      # HashList merkle tree caching, so only check if htr's mismatch.
+      if not pass:
+        reportDiff(preState, postState)
+      check:
+        done.isOk()
+        pass
+    else:
+      check: done.isErr() # No post state = processing should fail
+
+suite baseDescription & "Attestation " & preset():
+  proc applyAttestation(
+      preState: var eip8321.BeaconState, attestation: gloas.Attestation):
+      Result[void, cstring] =
+    var cache: StateCache
+    let
+      total_active_balance = get_total_active_balance(preState, cache)
+      base_reward_per_increment =
+        get_base_reward_per_increment(total_active_balance)
+      parent_slot = preState.latest_execution_payload_bid.slot
+
+    # This returns the proposer reward for including the attestation, which
+    # isn't tested here.
+    discard ? process_attestation(
+      preState, attestation, {strictVerification}, base_reward_per_increment,
+      parent_slot, cache)
+    ok()
+
+  for path in walkTests(OpAttestationsDir):
+    runTest[gloas.Attestation, typeof applyAttestation](
+      OpAttestationsDir, suiteName, "Attestation", "attestation",
+      applyAttestation, path)
+
+suite baseDescription & "Attester Slashing " & preset():
+  proc applyAttesterSlashing(
+      preState: var eip8321.BeaconState,
+      attesterSlashing: gloas.AttesterSlashing): Result[void, cstring] =
+    var cache: StateCache
+    doAssert (? process_attester_slashing(
+      defaultRuntimeConfig, preState, attesterSlashing, {},
+      get_state_exit_queue_info(preState), cache))[0] > 0.Gwei
+    ok()
+
+  for path in walkTests(OpAttSlashingDir):
+    runTest[gloas.AttesterSlashing, typeof applyAttesterSlashing](
+      OpAttSlashingDir, suiteName, "Attester Slashing", "attester_slashing",
+      applyAttesterSlashing, path)
+
+suite baseDescription & "Block Header " & preset():
+  proc applyBlockHeader(
+      preState: var eip8321.BeaconState, blck: eip8321.BeaconBlock):
+      Result[void, cstring] =
+    var cache: StateCache
+    process_block_header(preState, blck, {}, cache)
+
+  for path in walkTests(OpBlockHeaderDir):
+    runTest[eip8321.BeaconBlock, typeof applyBlockHeader](
+      OpBlockHeaderDir, suiteName, "Block Header", "block",
+      applyBlockHeader, path)
+
+suite baseDescription & "RANDAO " & preset():
+  proc applyRandao(
+      preState: var eip8321.BeaconState, blck: eip8321.BeaconBlock):
+      Result[void, cstring] =
+    var cache: StateCache
+    process_randao(preState, blck.body, {}, cache)
+
+  for path in walkTests(OpRandaoDir):
+    if not fileExists(OpRandaoDir/"pyspec_tests"/path/"pre.ssz_snappy"):
+      continue
+    runTest[eip8321.BeaconBlock, typeof applyRandao](
+      OpRandaoDir, suiteName, "RANDAO", "block", applyRandao, path)
+
+suite baseDescription & "RANDAO Commitment Registration " & preset():
+  proc applyRandaoCommitmentRegistration(
+      preState: var eip8321.BeaconState,
+      registration: SignedRandaoCommitmentRegistration):
+      Result[void, cstring] =
+    process_randao_commitment_registration(
+      defaultRuntimeConfig, preState, registration, {})
+
+  for path in walkTests(OpRandaoCommitmentRegistrationDir):
+    runTest[SignedRandaoCommitmentRegistration,
+            typeof applyRandaoCommitmentRegistration](
+      OpRandaoCommitmentRegistrationDir, suiteName,
+      "RANDAO Commitment Registration", "randao_commitment_registration",
+      applyRandaoCommitmentRegistration, path)
+
+from ../../../beacon_chain/spec/datatypes/capella import
+  SignedBLSToExecutionChange
+
+suite baseDescription & "BLS to execution change " & preset():
+  proc applyBlsToExecutionChange(
+      preState: var eip8321.BeaconState,
+      signed_address_change: SignedBLSToExecutionChange):
+      Result[void, cstring] =
+    process_bls_to_execution_change(
+      defaultRuntimeConfig, preState, signed_address_change)
+
+  for path in walkTests(OpBlsToExecutionChangeDir):
+    runTest[SignedBLSToExecutionChange, typeof applyBlsToExecutionChange](
+      OpBlsToExecutionChangeDir, suiteName, "BLS to execution change", "address_change",
+      applyBlsToExecutionChange, path)
+
+from ../../../beacon_chain/validator_bucket_sort import sortValidatorBuckets
+
+suite baseDescription & "Consolidation Request " & preset():
+  proc applyConsolidationRequest(
+      preState: var eip8321.BeaconState,
+      consolidation_request: ConsolidationRequest): Result[void, cstring] =
+    var cache: StateCache
+    process_consolidation_request(
+      defaultRuntimeConfig, preState,
+      sortValidatorBuckets(preState.validators.asSeq)[],
+      consolidation_request, cache)
+    ok()
+
+  for path in walkTests(OpConsolidationRequestDir):
+    runTest[ConsolidationRequest, typeof applyConsolidationRequest](
+      OpConsolidationRequestDir, suiteName, "Consolidation Request",
+      "consolidation_request", applyConsolidationRequest, path)
+
+suite baseDescription & "Deposit Request " & preset():
+  func applyDepositRequest(
+      preState: var eip8321.BeaconState, depositRequest: DepositRequest):
+      Result[void, cstring] =
+    # [Modified in Gloas:EIP8282] deposit requests are queued like Fulu
+    process_deposit_request(
+      defaultRuntimeConfig, preState, depositRequest, {})
+
+  for path in walkTests(OpDepositRequestDir):
+    runTest[DepositRequest, typeof applyDepositRequest](
+      OpDepositRequestDir, suiteName, "Deposit Request", "deposit_request",
+      applyDepositRequest, path)
+
+from ../../../beacon_chain/spec/datatypes/gloas import
+  BuilderDepositRequest, BuilderExitRequest, BuilderIndex, PayloadAttestation,
+  SignedExecutionPayloadEnvelope
+
+suite baseDescription & "Builder Deposit Request " & preset():
+  func applyBuilderDepositRequest(
+      preState: var eip8321.BeaconState,
+      builderDepositRequest: gloas.BuilderDepositRequest):
+      Result[void, cstring] =
+    var next_builder_index: BuilderIndex
+    process_builder_deposit_request(
+      defaultRuntimeConfig, preState,
+      sortValidatorBuckets(preState.builders.asSeq)[], builderDepositRequest,
+      next_builder_index)
+    ok()
+
+  for path in walkTests(OpBuilderDepositRequestDir):
+    runTest[gloas.BuilderDepositRequest, typeof applyBuilderDepositRequest](
+      OpBuilderDepositRequestDir, suiteName, "Builder Deposit Request",
+      "builder_deposit_request", applyBuilderDepositRequest, path)
+
+suite baseDescription & "Builder Exit Request " & preset():
+  func applyBuilderExitRequest(
+      preState: var eip8321.BeaconState,
+      builderExitRequest: gloas.BuilderExitRequest):
+      Result[void, cstring] =
+    process_builder_exit_request(
+      defaultRuntimeConfig, preState,
+      sortValidatorBuckets(preState.builders.asSeq)[], builderExitRequest)
+    ok()
+
+  for path in walkTests(OpBuilderExitRequestDir):
+    runTest[gloas.BuilderExitRequest, typeof applyBuilderExitRequest](
+      OpBuilderExitRequestDir, suiteName, "Builder Exit Request",
+      "builder_exit_request", applyBuilderExitRequest, path)
+
+suite baseDescription & "Parent Execution Payload " & preset():
+  proc applyParentExecPayload(
+      preState: var eip8321.BeaconState,
+      blck: eip8321.BeaconBlock): Result[void, cstring] =
+    var cache: StateCache
+    process_parent_execution_payload(
+      defaultRuntimeConfig, preState, blck, {}, cache)
+
+  for path in walkTests(OpParentExecutionPayloadDir):
+    runTest[eip8321.BeaconBlock, typeof applyParentExecPayload](
+      OpParentExecutionPayloadDir, suiteName, "Parent Execution Payload",
+      "block", applyParentExecPayload, path)
+
+suite baseDescription & "Execution Payload Bid " & preset():
+  proc applyExecutionPayloadBid(
+      preState: var eip8321.BeaconState,
+      signedBid: heze.SignedExecutionPayloadBid): Result[void, cstring] =
+    var cache: StateCache
+    let parent_slot = preState.latest_execution_payload_bid.slot
+    doAssert (? process_execution_payload_bid(
+      defaultRuntimeConfig, preState, signedBid, cache)) == parent_slot
+    ok()
+
+  for path in walkTests(OpExecutionPayloadBidDir):
+    runTest[heze.SignedExecutionPayloadBid, typeof applyExecutionPayloadBid](
+      OpExecutionPayloadBidDir, suiteName, "Execution Payload Bid",
+      "execution_payload_bid", applyExecutionPayloadBid, path)
+
+suite baseDescription & "Payload Attestation " & preset():
+  proc applyPayloadAttestation(
+      cfg: RuntimeConfig, preState: var eip8321.BeaconState,
+      payloadAttestation: PayloadAttestation): Result[void, cstring] =
+    process_payload_attestation(cfg, preState, payloadAttestation)
+
+  for path in walkTests(OpPayloadAttestationDir):
+    runTest[PayloadAttestation, typeof applyPayloadAttestation](
+      OpPayloadAttestationDir, suiteName, "Payload Attestation",
+      "payload_attestation", applyPayloadAttestation, path)
+
+suite baseDescription & "Withdrawal Request " & preset():
+  func applyWithdrawalRequest(
+      preState: var eip8321.BeaconState, withdrawalRequest: WithdrawalRequest):
+      Result[void, cstring] =
+    var cache: StateCache
+    process_withdrawal_request(
+      defaultRuntimeConfig, preState,
+      sortValidatorBuckets(preState.validators.asSeq)[], withdrawalRequest,
+      cache)
+    ok()
+
+  for path in walkTests(OpWithdrawalRequestDir):
+    runTest[WithdrawalRequest, typeof applyWithdrawalRequest](
+      OpWithdrawalRequestDir, suiteName, "Withdrawal Request",
+      "withdrawal_request", applyWithdrawalRequest, path)
+
+suite baseDescription & "Proposer Slashing " & preset():
+  proc applyProposerSlashing(
+      preState: var eip8321.BeaconState, proposerSlashing: ProposerSlashing):
+      Result[void, cstring] =
+    var cache: StateCache
+    doAssert (? process_proposer_slashing(
+      defaultRuntimeConfig, preState, proposerSlashing, {},
+      get_state_exit_queue_info(preState), cache))[0] > 0.Gwei
+    ok()
+
+  for path in walkTests(OpProposerSlashingDir):
+    runTest[ProposerSlashing, typeof applyProposerSlashing](
+      OpProposerSlashingDir, suiteName, "Proposer Slashing", "proposer_slashing",
+      applyProposerSlashing, path)
+
+suite baseDescription & "Sync Aggregate " & preset():
+  proc applySyncAggregate(
+      preState: var eip8321.BeaconState, syncAggregate: SyncAggregate):
+      Result[void, cstring] =
+    var cache: StateCache
+    discard ? process_sync_aggregate(
+      preState, syncAggregate, get_total_active_balance(preState, cache),
+      {}, cache)
+    ok()
+
+  for path in walkTests(OpSyncAggregateDir):
+    runTest[SyncAggregate, typeof applySyncAggregate](
+      OpSyncAggregateDir, suiteName, "Sync Aggregate", "sync_aggregate",
+      applySyncAggregate, path)
+
+suite baseDescription & "Voluntary Exit " & preset():
+  proc applyVoluntaryExit(
+      preState: var eip8321.BeaconState, voluntaryExit: SignedVoluntaryExit):
+      Result[void, cstring] =
+    var cache: StateCache
+    if process_voluntary_exit(
+        defaultRuntimeConfig, preState, voluntaryExit, {},
+        get_state_exit_queue_info(preState), cache).isOk:
+      ok()
+    else:
+      err("")
+
+  for path in walkTests(OpVoluntaryExitDir):
+    runTest[SignedVoluntaryExit, typeof applyVoluntaryExit](
+      OpVoluntaryExitDir, suiteName, "Voluntary Exit", "voluntary_exit",
+      applyVoluntaryExit, path)
+
+  for path in walkTests(OpVoluntaryExitChurnDir):
+    runTest[SignedVoluntaryExit, typeof applyVoluntaryExit](
+      OpVoluntaryExitChurnDir, suiteName, "Voluntary Exit Churn",
+      "voluntary_exit", applyVoluntaryExit, path)
+
+suite baseDescription & "Withdrawals " & preset():
+  for path in walkTests(OpWithdrawalsDir):
+    # See: https://github.com/status-im/nimbus-eth2/pull/7926#discussion_r2776852494
+    if path in ["invalid_validator_index_pending_partial",
+                "invalid_builder_index_sweep",
+                "invalid_validator_index_sweep",
+                "invalid_builder_index_pending"]:
+      continue
+    let prefix =
+      if fileExists(OpWithdrawalsDir / "pyspec_tests" / path / "post.ssz_snappy"):
+        "[Valid]   "
+      else:
+        "[Invalid] "
+
+    test prefix & baseDescription & "Withdrawals - " & path:
+      let
+        testDir = OpWithdrawalsDir / "pyspec_tests" / path
+        preState = newClone(
+          parseTest(testDir/"pre.ssz_snappy", SSZ, eip8321.BeaconState))
+        done = process_withdrawals(preState[])
+
+      if fileExists(testDir/"post.ssz_snappy"):
+        let
+          postState = newClone(parseTest(
+            testDir/"post.ssz_snappy", SSZ, eip8321.BeaconState))
+          pass = preState[].hash_tree_root() == postState[].hash_tree_root()
+        if not pass:
+          reportDiff(preState, postState)
+        check:
+          done.isOk()
+          pass
+      else:
+        check: done.isErr()

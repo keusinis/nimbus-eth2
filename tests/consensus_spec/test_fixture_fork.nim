@@ -24,7 +24,7 @@ proc runTest(
 
   test "EF - " & forkName & " - Fork - " & unitTestName & preset():
     let shouldSkip =
-      when BeaconStatePost.kind == ConsensusFork.Heze:
+      when BeaconStatePost.kind in [ConsensusFork.Heze, ConsensusFork.Eip8321]:
         unitTestName == "fork_base_state"
       else:
         false
@@ -118,4 +118,13 @@ suite "EF - Heze - Fork " & preset():
     SszTestsDir/const_preset/"heze"/"fork"/"fork"/"pyspec_tests"
   for kind, path in walkDir(OpForkDir, relative = true, checkDir = true):
     runTest(gloas.BeaconState, heze.BeaconState, "Heze", OpForkDir,
+            suiteName, path)
+
+from ../../beacon_chain/spec/datatypes/eip8321 import BeaconState
+
+suite "EF - Eip8321 - Fork " & preset():
+  const OpForkDir =
+    SszTestsDir/const_preset/"eip8321"/"fork"/"fork"/"pyspec_tests"
+  for kind, path in walkDir(OpForkDir, relative = true, checkDir = true):
+    runTest(heze.BeaconState, eip8321.BeaconState, "Eip8321", OpForkDir,
             suiteName, path)

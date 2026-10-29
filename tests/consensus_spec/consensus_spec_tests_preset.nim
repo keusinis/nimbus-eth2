@@ -21,6 +21,7 @@ import
   ./fulu/all_fulu_fixtures,
   ./gloas/all_gloas_fixtures,
   ./heze/all_heze_fixtures,
+  ./eip8321/all_eip8321_fixtures,
   ./test_fixture_fork,
   ./test_fixture_fork_choice,
   ./test_fixture_gossip_validation,

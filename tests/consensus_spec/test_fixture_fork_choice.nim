@@ -294,7 +294,8 @@ proc stepOnBlock(
   # would also have `true` validity because it'd not be known they weren't, so
   # adding this mock of the block processor is realistic and sufficient.
   when consensusFork >= ConsensusFork.Bellatrix and
-       consensusFork notin [ConsensusFork.Gloas, ConsensusFork.Heze]:
+       consensusFork notin [
+         ConsensusFork.Gloas, ConsensusFork.Heze, ConsensusFork.Eip8321]:
     let executionBlockHash =
       signedBlock.message.body.execution_payload.block_hash
     if executionBlockHash in invalidatedHashes:
@@ -626,7 +627,7 @@ template fcSuite(suiteName: static[string], testPathElem: static[string]) =
       let testsPath = presetPath/path/testPathElem
       if kind != pcDir or not os_ops.dirExists(testsPath):
         continue
-      if path.contains("heze"):
+      if path.contains("heze") or path.contains("eip8321"):
         continue
       let fork = forkForPathComponent(path).valueOr:
         raiseAssert "Unknown test fork: " & testsPath

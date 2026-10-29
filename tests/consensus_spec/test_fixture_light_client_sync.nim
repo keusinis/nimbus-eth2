@@ -55,8 +55,9 @@ type
 
 func consensusForkForVersion(
     cfg: RuntimeConfig, version: Version): Opt[ConsensusFork] =
-  static: doAssert ConsensusFork.high == ConsensusFork.Heze
-  if   version == cfg.HEZE_FORK_VERSION:      ok(ConsensusFork.Heze)
+  static: doAssert ConsensusFork.high == ConsensusFork.Eip8321
+  if   version == cfg.EIP8321_FORK_VERSION:   ok(ConsensusFork.Eip8321)
+  elif version == cfg.HEZE_FORK_VERSION:      ok(ConsensusFork.Heze)
   elif version == cfg.GLOAS_FORK_VERSION:     ok(ConsensusFork.Gloas)
   elif version == cfg.FULU_FORK_VERSION:      ok(ConsensusFork.Fulu)
   elif version == cfg.ELECTRA_FORK_VERSION:   ok(ConsensusFork.Electra)

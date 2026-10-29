@@ -97,7 +97,7 @@ proc runRewardsTest*(
 proc runRewardsTest*[T:
     altair.BeaconState | bellatrix.BeaconState | capella.BeaconState |
     deneb.BeaconState | electra.BeaconState | fulu.BeaconState |
-    gloas.BeaconState | heze.BeaconState](
+    gloas.BeaconState | heze.BeaconState | eip8321.BeaconState](
     rewardsDir, identifier: string, _: typedesc[T]) =
   var info: altair.EpochInfo
 

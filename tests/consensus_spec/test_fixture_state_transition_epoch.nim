@@ -181,6 +181,13 @@ template epochProcessingSuite(consensusFork: static ConsensusFork): untyped =
       process_ptc_window(state, cache)
       Result[void, cstring].ok()
 
+  when consensusFork >= ConsensusFork.Eip8321:
+    const PendingRandaoCommitmentsDir = RootDir/"pending_randao_commitments"
+
+    runSuite(consensusFork, PendingRandaoCommitmentsDir,
+        "Pending RANDAO commitments"):
+      process_pending_randao_commitments(state)
+
   const expectedDirs = block:
     var s = @[
       JustificationFinalizationDir, RegistryUpdatesDir, SlashingsDir,
@@ -207,6 +214,8 @@ template epochProcessingSuite(consensusFork: static ConsensusFork): untyped =
       s.add(PendingDepositsChurnDir)
     when consensusFork >= ConsensusFork.Gloas:
       s.add(PtcWindowDir)
+    when consensusFork >= ConsensusFork.Eip8321:
+      s.add(PendingRandaoCommitmentsDir)
     s
 
   when consensusFork == ConsensusFork.Phase0:

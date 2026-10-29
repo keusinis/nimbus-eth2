@@ -1442,6 +1442,567 @@ ConsensusSpecPreset-minimal
 + test_process_light_client_update_at_period_boundary                                        OK
 + test_process_light_client_update_not_timeout                                               OK
 ```
+## EF - Eip8321 - Fork  [Preset: minimal]
+```diff
+  EF - Eip8321 - Fork - fork_base_state [Preset: minimal]                                    Skip
++ EF - Eip8321 - Fork - fork_many_next_epoch [Preset: minimal]                               OK
++ EF - Eip8321 - Fork - fork_next_epoch [Preset: minimal]                                    OK
++ EF - Eip8321 - Fork - fork_next_epoch_with_block [Preset: minimal]                         OK
++ EF - Eip8321 - Fork - fork_random_large_validator_set [Preset: minimal]                    OK
++ EF - Eip8321 - Fork - fork_random_low_balances [Preset: minimal]                           OK
++ EF - Eip8321 - Fork - fork_random_misc_balances [Preset: minimal]                          OK
+```
+## EF - Eip8321 - Operations - Attestation  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_after_max_inclusion_slot       OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_attestation_data_index_not_zer OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_attestation_data_index_too_hig OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_attestation_signature          OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_bad_source_root                OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_before_inclusion_delay         OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_committee_index                OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_correct_attestation_included_a OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_current_source_root            OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_empty_participants_seemingly_v OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_empty_participants_zeroes_sig  OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_future_target_epoch            OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_incorrect_head_and_target_incl OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_incorrect_head_included_after_ OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_incorrect_target_included_afte OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_index                          OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_mismatched_target_and_slot     OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_new_source_epoch               OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_nonset_bits_for_one_committee  OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_nonset_committee_bits          OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_nonset_multiple_committee_bits OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_old_source_epoch               OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_old_target_epoch               OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_previous_source_root           OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_same_slot_attestation_index_on OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_same_slot_attestation_index_on OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_same_slot_attestation_index_on OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_source_root_is_target_root     OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_too_few_aggregation_bits       OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_too_many_aggregation_bits      OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_too_many_committee_bits        OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_wrong_index_for_committee_sign OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_wrong_index_for_slot_0         OK
++ [Invalid] EF - Eip8321 - Operations - Attestation - invalid_wrong_index_for_slot_1         OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - at_max_inclusion_slot                  OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - builder_payment_weight_accumulates     OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - builder_payment_weight_no_double_count OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - builder_payment_weight_no_increment_fo OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - builder_payment_weight_tracking        OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - builder_payment_weight_tracking_previo OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - correct_attestation_included_at_max_in OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - correct_attestation_included_at_min_in OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - correct_attestation_included_at_one_ep OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - correct_attestation_included_at_sqrt_e OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_and_target_included_at_ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_and_target_included_at_ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_and_target_min_inclusio OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_included_at_max_inclusi OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_included_at_min_inclusi OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_head_included_at_sqrt_epoch_ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_target_included_at_epoch_del OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_target_included_at_min_inclu OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - incorrect_target_included_at_sqrt_epoc OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - matching_payload_gets_head_flag        OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - mismatched_payload_no_head_flag        OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - multi_proposer_index_iterations        OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - multiple_committees                    OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - old_attested_block_gets_head_flag      OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - one_basic_attestation                  OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - one_committee_with_gap                 OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - previous_epoch                         OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - same_slot_attestation_ignores_payload_ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - valid_attestation_data_index_one_previ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - valid_attestation_data_index_one_previ OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - valid_attestation_data_index_zero_prev OK
++ [Valid]   EF - Eip8321 - Operations - Attestation - valid_same_slot_attestation_index_zero OK
+```
+## EF - Eip8321 - Operations - Attester Slashing  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_all_empty_indices        OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_bad_extra_index     OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_bad_replaced_index  OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_duplicate_index_dou OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_duplicate_index_nor OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_empty_indices       OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att1_high_index          OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_bad_extra_index     OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_bad_replaced_index  OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_duplicate_index_dou OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_duplicate_index_nor OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_empty_indices       OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_att2_high_index          OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_incorrect_sig_1          OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_incorrect_sig_1_and_2    OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_incorrect_sig_2          OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_no_double_or_surround    OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_participants_already_sla OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_same_data                OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_too_many_attesting_indic OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_unsorted_att_1           OK
++ [Invalid] EF - Eip8321 - Operations - Attester Slashing - invalid_unsorted_att_2           OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - already_exited_long_ago          OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - already_exited_recent            OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - attestation_from_future          OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - basic_double                     OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - basic_surround                   OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - low_balances                     OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - misc_balances                    OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - proposer_index_slashed           OK
++ [Valid]   EF - Eip8321 - Operations - Attester Slashing - with_effective_balance_disparity OK
+```
+## EF - Eip8321 - Operations - BLS to execution change  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_already_0x01       OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_bad_signature      OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_current_fork_versi OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_genesis_validators OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_incorrect_from_bls OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_previous_fork_vers OK
++ [Invalid] EF - Eip8321 - Operations - BLS to execution change - invalid_val_index_out_of_r OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - genesis_fork_version       OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success                    OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success_exited             OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success_in_activation_queu OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success_in_exit_queue      OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success_not_activated      OK
++ [Valid]   EF - Eip8321 - Operations - BLS to execution change - success_withdrawable       OK
+```
+## EF - Eip8321 - Operations - Block Header  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Block Header - invalid_multiple_blocks_single_slot   OK
++ [Invalid] EF - Eip8321 - Operations - Block Header - invalid_parent_root                   OK
++ [Invalid] EF - Eip8321 - Operations - Block Header - invalid_proposer_index                OK
++ [Invalid] EF - Eip8321 - Operations - Block Header - invalid_proposer_slashed              OK
++ [Invalid] EF - Eip8321 - Operations - Block Header - invalid_slot_block_header             OK
++ [Valid]   EF - Eip8321 - Operations - Block Header - basic_block_header                    OK
+```
+## EF - Eip8321 - Operations - Builder Deposit Request  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
++ [Valid]   EF - Eip8321 - Operations - Builder Deposit Request - process_builder_deposit_re OK
+```
+## EF - Eip8321 - Operations - Builder Exit Request  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
++ [Valid]   EF - Eip8321 - Operations - Builder Exit Request - process_builder_exit_request_ OK
+```
+## EF - Eip8321 - Operations - Consolidation Request  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_in_curre OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_in_new_c OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_source_h OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_target_h OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_with_com OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_with_exc OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_with_ins OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_consolidation_with_pre OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - basic_switch_to_compounding  OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - consolidation_balance_larger OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - consolidation_balance_throug OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - consolidation_churn_limit_ba OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_exceed_pending_con OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_exited_source      OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_exited_target      OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_inactive_source    OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_inactive_target    OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_no_source_executio OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_not_enough_consoli OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_same_source_target OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_source_address     OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_source_has_pending OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_source_not_active_ OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_source_pubkey_is_t OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_source_with_bls_cr OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_target_with_bls_cr OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_target_with_eth1_c OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_unknown_source_pub OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - incorrect_unknown_target_pub OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_exited OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_inacti OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_not_au OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_source OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_source OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_unknow OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_with_e OK
++ [Valid]   EF - Eip8321 - Operations - Consolidation Request - switch_to_compounding_with_p OK
+```
+## EF - Eip8321 - Operations - Deposit Request  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request__builder_c OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request__builder_p OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request__builder_p OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_eth1_crede OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_extra_gwei OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_greater_th OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_invalid_si OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_max_effect OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_min_activa OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_pending_de OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_top_up_inv OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_top_up_max OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_top_up_min OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_top_up_sti OK
++ [Valid]   EF - Eip8321 - Operations - Deposit Request - process_deposit_request_undefined_ OK
+```
+## EF - Eip8321 - Operations - Execution Payload Bid  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Invalid] EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
++ [Valid]   EF - Eip8321 - Operations - Execution Payload Bid - process_execution_payload_bi OK
+```
+## EF - Eip8321 - Operations - Parent Execution Payload  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Parent Execution Payload - invalid_too_many_builder_ OK
++ [Invalid] EF - Eip8321 - Operations - Parent Execution Payload - invalid_too_many_builder_ OK
++ [Invalid] EF - Eip8321 - Operations - Parent Execution Payload - invalid_too_many_consolid OK
++ [Invalid] EF - Eip8321 - Operations - Parent Execution Payload - invalid_too_many_withdraw OK
++ [Invalid] EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - deposit_requests_greater_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - max_builder_deposit_reque OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - max_builder_exit_requests OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - max_consolidation_request OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - max_withdrawal_requests   OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
++ [Valid]   EF - Eip8321 - Operations - Parent Execution Payload - process_parent_execution_ OK
+```
+## EF - Eip8321 - Operations - Payload Attestation  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_cr OK
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_fu OK
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_in OK
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_in OK
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_no OK
++ [Invalid] EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_to OK
++ [Valid]   EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_pa OK
++ [Valid]   EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_pa OK
++ [Valid]   EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_pa OK
++ [Valid]   EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_sa OK
++ [Valid]   EF - Eip8321 - Operations - Payload Attestation - process_payload_attestation_us OK
+```
+## EF - Eip8321 - Operations - Proposer Slashing  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_different_proposer_indic OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_headers_are_same_sigs_ar OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_headers_are_same_sigs_ar OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_incorrect_proposer_index OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_incorrect_sig_1          OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_incorrect_sig_1_and_2    OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_incorrect_sig_1_and_2_sw OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_incorrect_sig_2          OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_proposer_is_not_activate OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_proposer_is_slashed      OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_proposer_is_withdrawn    OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_proposer_withdrawable_cu OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_slots_of_different_epoch OK
++ [Invalid] EF - Eip8321 - Operations - Proposer Slashing - invalid_slots_same_epoch_differe OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - basic                            OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - block_header_from_future         OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - block_header_from_past           OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_current OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_current OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_current OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_previou OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_previou OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_previou OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_deletion_too_lat OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_empty_current_ep OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_empty_old_epoch  OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_empty_previous_e OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - builder_payment_not_deleted_fore OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - header_slot_at_epoch_end         OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - header_slot_at_epoch_start       OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - headers_differ_multiple_roots    OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - headers_differ_only_body_root    OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - headers_differ_only_state_root   OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - proposer_activated_current_epoch OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - proposer_index_last              OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - proposer_index_zero              OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - proposer_withdrawable_next_epoch OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - self_slashing_future_slot        OK
++ [Valid]   EF - Eip8321 - Operations - Proposer Slashing - slashed_and_proposer_index_the_s OK
+```
+## EF - Eip8321 - Operations - RANDAO  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_hash_chain_reveal_not_preimage      OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_hash_chain_reveal_skips_a_link      OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_registered_proposer_with_bls_reveal OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_registered_proposer_with_nonempty_b OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_unregistered_proposer_with_hash_cha OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO - invalid_zero_hash_chain_reveal              OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO - hash_chain_reveal                           OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO - unregistered_proposer_uses_bls_reveal       OK
+```
+## EF - Eip8321 - Operations - RANDAO Commitment Registration  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_already_reg OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_incorrect_s OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_registratio OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_signature_o OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_validator_i OK
++ [Invalid] EF - Eip8321 - Operations - RANDAO Commitment Registration - invalid_zero_commit OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO Commitment Registration - success             OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO Commitment Registration - success_exited_vali OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO Commitment Registration - success_last_valida OK
++ [Valid]   EF - Eip8321 - Operations - RANDAO Commitment Registration - success_second_vali OK
+```
+## EF - Eip8321 - Operations - Sync Aggregate  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_bad_domain        OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_extra_participant OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_infinite_signatur OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_infinite_signatur OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_missing_participa OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_no_participants   OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_past_block        OK
++ [Invalid] EF - Eip8321 - Operations - Sync Aggregate - invalid_signature_previous_committe OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - proposer_in_committee_with_particip OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - proposer_in_committee_without_parti OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_all_but_one_participating_wi OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_high_participation_without_d OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_low_participation_without_du OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_misc_balances_and_half_parti OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_only_one_participant_without OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - random_with_exits_without_duplicate OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_rewards_empty_partic OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_rewards_nonduplicate OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_rewards_not_full_par OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_with_nonparticipatin OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_with_nonparticipatin OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_with_participating_e OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - sync_committee_with_participating_w OK
++ [Valid]   EF - Eip8321 - Operations - Sync Aggregate - valid_signature_future_committee    OK
+```
+## EF - Eip8321 - Operations - Voluntary Exit  [Preset: minimal]
+```diff
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_incorrect_signature         OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_already_exited    OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_exit_in_future    OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_has_pending_withd OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_incorrect_validat OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_not_active        OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_validator_not_active_long_e OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_voluntary_exit_with_current OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_voluntary_exit_with_current OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_voluntary_exit_with_genesis OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - invalid_voluntary_exit_with_genesis OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - voluntary_exit__invalid__builder_in OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - voluntary_exit_with_previous_fork_v OK
++ [Invalid] EF - Eip8321 - Operations - Voluntary Exit - voluntary_exit_with_previous_fork_v OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - basic                               OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - default_exit_epoch_subsequent_exit  OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - min_balance_exit                    OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - min_balance_exits_above_churn       OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - min_balance_exits_up_to_churn       OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - success_exit_queue__min_churn       OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - success_exit_queue__scaled_churn    OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit - voluntary_exit_with_pending_deposit OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit Churn - exit_churn__equal_to_activati OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit Churn - exit_churn__greater_than_acti OK
++ [Valid]   EF - Eip8321 - Operations - Voluntary Exit Churn - exit_churn__less_than_activat OK
+```
+## EF - Eip8321 - Operations - Withdrawal Request  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - activation_epoch_less_than_shar OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_partial_withdrawal_reques OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_partial_withdrawal_reques OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_partial_withdrawal_reques OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_withdrawal_request        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_withdrawal_request_with_c OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_withdrawal_request_with_f OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - basic_withdrawal_request_with_f OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - full_exit_request_has_partial_w OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - incorrect_inactive_validator    OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - incorrect_source_address        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - incorrect_withdrawal_credential OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - insufficient_balance            OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - insufficient_effective_balance  OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - no_compounding_credentials      OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - no_excess_balance               OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - on_withdrawal_request_initiated OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_activation_e OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_incorrect_so OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_incorrect_wi OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_on_exit_init OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_queue_full   OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_request_with OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_request_with OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_request_with OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_request_with OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - partial_withdrawal_request_with OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - pending_withdrawals_consume_all OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawal Request - unknown_pubkey                  OK
+```
+## EF - Eip8321 - Operations - Withdrawals  [Preset: minimal]
+```diff
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - all_builder_withdrawals_zero_balance   OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_and_pending_leave_room_for_swe OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_max_minus_one_plus_one_regular OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_payments_exceed_limit_blocks_o OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_sweep_after_pending_withdrawal OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_sweep_index_wrap_around        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_sweep_not_withdrawable_skipped OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_sweep_withdrawals_limit        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_sweep_zero_balance_skipped     OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_uses_fee_recipient_address     OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_withdrawal_insufficient_balanc OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_withdrawal_insufficient_balanc OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_withdrawals_processed_order    OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - builder_zero_withdrawal_amount         OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - compounding_validator_partial_withdraw OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - duplicate_builder_index_in_pending_wit OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - early_return_empty_parent_block        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - empty_parent_preserves_populated_expec OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - full_builder_payload_reserves_sweep_sl OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - full_pending_withdrawals_but_first_ski OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - full_pending_withdrawals_but_first_ski OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - full_pending_withdrawals_but_first_ski OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - maximum_withdrawals_per_payload_limit  OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - multiple_builder_sweep_withdrawals     OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - multiple_builder_withdrawals           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - no_builders_max_pending_with_sweep_spi OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - no_builders_no_pending_max_sweep_withd OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_legac OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_legac OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - partially_withdrawable_validator_legac OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_at_max             OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_at_max_mixed_with_ OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_exiting_validator  OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_low_effective_bala OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_mixed_with_sweep_a OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_next_epoch         OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_no_excess_balance  OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_one_skipped_one_ef OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_processing         OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_processing_exceeds OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_two_partial_withdr OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_two_partial_withdr OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_with_effective_swe OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_with_ineffective_s OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_with_ineffective_s OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - pending_withdrawals_with_sweep_differe OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_0                               OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_partial_withdrawals_1           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_partial_withdrawals_2           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_partial_withdrawals_3           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_partial_withdrawals_4           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - random_partial_withdrawals_5           OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - single_builder_sweep_withdrawal        OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - single_builder_withdrawal              OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_excess_balance_but_no_max_effe OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_excess_balance_but_no_max_effe OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_max_partial_withdrawable       OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_max_plus_one_withdrawable      OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_mixed_fully_and_partial_withdr OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_mixed_fully_and_partial_withdr OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_no_excess_balance              OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_no_excess_balance_compounding  OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_no_max_effective_balance       OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_no_max_effective_balance_compo OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_full_withdrawal            OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawable_activ OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawable_exite OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawable_exite OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawable_in_ex OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawable_not_y OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_one_partial_withdrawal         OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_two_partial_withdrawable       OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - success_zero_expected_withdrawals      OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - withdrawable_epoch_but_0_balance       OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - withdrawable_epoch_but_0_effective_bal OK
++ [Valid]   EF - Eip8321 - Operations - Withdrawals - zero_hash_genesis_skips_withdrawals    OK
+```
+## EF - Eip8321 - Sanity - Slots  [Preset: minimal]
+```diff
++ EF - Eip8321 - Slots - balance_change_affects_proposer [Preset: minimal]                   OK
++ EF - Eip8321 - Slots - double_empty_epoch [Preset: minimal]                                OK
++ EF - Eip8321 - Slots - effective_decrease_balance_updates_lookahead [Preset: minimal]      OK
++ EF - Eip8321 - Slots - empty_epoch [Preset: minimal]                                       OK
++ EF - Eip8321 - Slots - execution_payload_availability_reset_from_set [Preset: minimal]     OK
++ EF - Eip8321 - Slots - execution_payload_availability_reset_from_unset [Preset: minimal]   OK
++ EF - Eip8321 - Slots - historical_accumulator [Preset: minimal]                            OK
++ EF - Eip8321 - Slots - multiple_pending_deposits_same_pubkey [Preset: minimal]             OK
++ EF - Eip8321 - Slots - multiple_pending_deposits_same_pubkey_above_upward_threshold [Prese OK
++ EF - Eip8321 - Slots - multiple_pending_deposits_same_pubkey_below_upward_threshold [Prese OK
++ EF - Eip8321 - Slots - multiple_pending_deposits_same_pubkey_compounding [Preset: minimal] OK
++ EF - Eip8321 - Slots - multiple_pending_deposits_same_pubkey_different_signature [Preset:  OK
++ EF - Eip8321 - Slots - over_epoch_boundary [Preset: minimal]                               OK
++ EF - Eip8321 - Slots - pending_consolidation [Preset: minimal]                             OK
++ EF - Eip8321 - Slots - pending_deposit_extra_gwei [Preset: minimal]                        OK
++ EF - Eip8321 - Slots - slots_1 [Preset: minimal]                                           OK
++ EF - Eip8321 - Slots - slots_2 [Preset: minimal]                                           OK
+```
 ## EF - Electra - Fork  [Preset: minimal]
 ```diff
 + EF - Electra - Fork - after_fork_deactivate_validators_from_deneb_to_electra [Preset: mini OK
@@ -3935,6 +4496,7 @@ ConsensusSpecPreset-minimal
 + Light client - Single merkle proof - minimal/deneb/light_client/single_merkle_proof/Beacon OK
 + Light client - Single merkle proof - minimal/deneb/light_client/single_merkle_proof/Beacon OK
 + Light client - Single merkle proof - minimal/deneb/light_client/single_merkle_proof/Beacon OK
++ Light client - Single merkle proof - minimal/eip8321/light_client/single_merkle_proof/Beac OK
 + Light client - Single merkle proof - minimal/electra/light_client/single_merkle_proof/Beac OK
 + Light client - Single merkle proof - minimal/electra/light_client/single_merkle_proof/Beac OK
 + Light client - Single merkle proof - minimal/electra/light_client/single_merkle_proof/Beac OK
@@ -4031,6 +4593,18 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Attester Slashing [Preset: minimal]
 ```diff
++ eip8321 - gossip_attester_slashing__ignore_already_seen                                    OK
++ eip8321 - gossip_attester_slashing__ignore_empty_attesting_indices_1                       OK
++ eip8321 - gossip_attester_slashing__ignore_empty_attesting_indices_2                       OK
++ eip8321 - gossip_attester_slashing__reject_attesting_index_out_of_range_1                  OK
++ eip8321 - gossip_attester_slashing__reject_attesting_index_out_of_range_2                  OK
++ eip8321 - gossip_attester_slashing__reject_invalid_attestation_1                           OK
++ eip8321 - gossip_attester_slashing__reject_invalid_attestation_2                           OK
++ eip8321 - gossip_attester_slashing__reject_no_slashable_validators                         OK
++ eip8321 - gossip_attester_slashing__reject_not_slashable_data                              OK
++ eip8321 - gossip_attester_slashing__reject_unsorted_indices_1                              OK
++ eip8321 - gossip_attester_slashing__reject_unsorted_indices_2                              OK
++ eip8321 - gossip_attester_slashing__valid                                                  OK
 + fulu - gossip_attester_slashing__ignore_already_seen                                       OK
 + fulu - gossip_attester_slashing__ignore_empty_attesting_indices_1                          OK
 + fulu - gossip_attester_slashing__ignore_empty_attesting_indices_2                          OK
@@ -4070,6 +4644,12 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - BLS To Execution Change [Preset: minimal]
 ```diff
++ eip8321 - gossip_bls_to_execution_change__ignore_already_seen                              OK
++ eip8321 - gossip_bls_to_execution_change__reject_bad_signature                             OK
++ eip8321 - gossip_bls_to_execution_change__reject_not_bls_credentials                       OK
++ eip8321 - gossip_bls_to_execution_change__reject_pubkey_mismatch                           OK
++ eip8321 - gossip_bls_to_execution_change__reject_validator_index_out_of_range              OK
++ eip8321 - gossip_bls_to_execution_change__valid                                            OK
 + fulu - gossip_bls_to_execution_change__ignore_already_seen                                 OK
 + fulu - gossip_bls_to_execution_change__reject_bad_signature                                OK
 + fulu - gossip_bls_to_execution_change__reject_not_bls_credentials                          OK
@@ -4091,6 +4671,45 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Beacon Aggregate And Proof [Preset: minimal]
 ```diff
++ eip8321 - gossip_beacon_aggregate_and_proof__accept_same_data_for_disjoint_committees      OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_at_slot_start                         OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_first_slot_when_epoch_window_closes   OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_first_slot_when_epoch_window_opens    OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_last_slot_at_slot_start               OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_last_slot_one_millisecond_before_slot OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_last_slot_when_epoch_window_closes    OK
++ eip8321 - gossip_beacon_aggregate_and_proof__accepts_one_millisecond_before_slot_start     OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_already_seen_aggregate                 OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_already_seen_aggregator                OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_block_not_seen                         OK
+  eip8321 - gossip_beacon_aggregate_and_proof__ignore_finalized_not_ancestor                 Skip
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_payload_envelope_unseen                OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_payload_pending_el_validation          OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_payload_status_without_envelope        OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignore_same_data_root_without_superset        OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignores_first_slot_after_epoch_window_closes  OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignores_first_slot_before_epoch_window_opens  OK
++ eip8321 - gossip_beacon_aggregate_and_proof__ignores_last_slot_after_epoch_window_closes   OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_aggregation_bits_size_mismatch         OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_aggregator_index_out_of_range          OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_aggregator_not_in_committee            OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_block_failed_validation                OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_committee_index_out_of_range           OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_data_index_too_high                    OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_epoch_mismatch                         OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_invalid_aggregate_signature            OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_invalid_aggregator_signature           OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_invalid_selection_proof                OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_multiple_committees                    OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_no_participants                        OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_payload_failed_el_validation           OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_same_slot_with_payload                 OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_target_not_ancestor                    OK
++ eip8321 - gossip_beacon_aggregate_and_proof__reject_zero_committees                        OK
++ eip8321 - gossip_beacon_aggregate_and_proof__valid                                         OK
++ eip8321 - gossip_beacon_aggregate_and_proof__valid_payload_validated                       OK
++ eip8321 - gossip_beacon_aggregate_and_proof__valid_two_aggregators_same_data               OK
++ eip8321 - gossip_beacon_aggregate_and_proof__valid_within_clock_disparity                  OK
 + fulu - gossip_beacon_aggregate_and_proof__accept_same_data_for_disjoint_committees         OK
 + fulu - gossip_beacon_aggregate_and_proof__accepts_at_slot_start                            OK
 + fulu - gossip_beacon_aggregate_and_proof__accepts_first_slot_when_epoch_window_closes      OK
@@ -4205,6 +4824,36 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Beacon Attestation [Preset: minimal]
 ```diff
++ eip8321 - gossip_beacon_attestation__accepts_at_slot_start                                 OK
++ eip8321 - gossip_beacon_attestation__accepts_first_slot_when_epoch_window_closes           OK
++ eip8321 - gossip_beacon_attestation__accepts_first_slot_when_epoch_window_opens            OK
++ eip8321 - gossip_beacon_attestation__accepts_last_slot_at_slot_start                       OK
++ eip8321 - gossip_beacon_attestation__accepts_last_slot_one_millisecond_before_slot_start   OK
++ eip8321 - gossip_beacon_attestation__accepts_last_slot_when_epoch_window_closes            OK
++ eip8321 - gossip_beacon_attestation__accepts_one_millisecond_before_slot_start             OK
++ eip8321 - gossip_beacon_attestation__ignore_already_seen                                   OK
++ eip8321 - gossip_beacon_attestation__ignore_block_not_seen                                 OK
+  eip8321 - gossip_beacon_attestation__ignore_finalized_not_ancestor                         Skip
++ eip8321 - gossip_beacon_attestation__ignore_payload_envelope_unseen                        OK
++ eip8321 - gossip_beacon_attestation__ignore_payload_pending_el_validation                  OK
++ eip8321 - gossip_beacon_attestation__ignore_payload_status_without_envelope                OK
++ eip8321 - gossip_beacon_attestation__ignores_first_slot_after_epoch_window_closes          OK
++ eip8321 - gossip_beacon_attestation__ignores_first_slot_before_epoch_window_opens          OK
++ eip8321 - gossip_beacon_attestation__ignores_last_slot_after_epoch_window_closes           OK
++ eip8321 - gossip_beacon_attestation__reject_attester_not_in_committee                      OK
++ eip8321 - gossip_beacon_attestation__reject_block_failed_validation                        OK
++ eip8321 - gossip_beacon_attestation__reject_committee_index_out_of_range                   OK
++ eip8321 - gossip_beacon_attestation__reject_data_index_too_high                            OK
++ eip8321 - gossip_beacon_attestation__reject_epoch_mismatch                                 OK
++ eip8321 - gossip_beacon_attestation__reject_invalid_signature                              OK
++ eip8321 - gossip_beacon_attestation__reject_payload_failed_el_validation                   OK
++ eip8321 - gossip_beacon_attestation__reject_same_slot_with_payload                         OK
++ eip8321 - gossip_beacon_attestation__reject_target_not_ancestor                            OK
++ eip8321 - gossip_beacon_attestation__reject_wrong_subnet                                   OK
++ eip8321 - gossip_beacon_attestation__valid                                                 OK
++ eip8321 - gossip_beacon_attestation__valid_payload_validated                               OK
++ eip8321 - gossip_beacon_attestation__valid_same_slot_index_zero                            OK
++ eip8321 - gossip_beacon_attestation__valid_within_clock_disparity                          OK
 + fulu - gossip_beacon_attestation__accepts_at_slot_start                                    OK
 + fulu - gossip_beacon_attestation__accepts_first_slot_when_epoch_window_closes              OK
 + fulu - gossip_beacon_attestation__accepts_first_slot_when_epoch_window_opens               OK
@@ -4291,6 +4940,50 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Beacon Block [Preset: minimal]
 ```diff
++ eip8321 - gossip_beacon_block__ignore_already_seen_proposer_slot                           OK
++ eip8321 - gossip_beacon_block__ignore_future_slot                                          OK
++ eip8321 - gossip_beacon_block__ignore_parent_not_seen                                      OK
++ eip8321 - gossip_beacon_block__ignore_parent_payload_not_verified                          OK
++ eip8321 - gossip_beacon_block__ignore_slot_not_greater_than_finalized                      OK
++ eip8321 - gossip_beacon_block__reject_bid_not_on_parent_execution_head                     OK
++ eip8321 - gossip_beacon_block__reject_bid_parent_root_mismatch                             OK
+  eip8321 - gossip_beacon_block__reject_finalized_checkpoint_not_ancestor                    Skip
++ eip8321 - gossip_beacon_block__reject_invalid_proposer_index                               OK
++ eip8321 - gossip_beacon_block__reject_invalid_proposer_signature                           OK
++ eip8321 - gossip_beacon_block__reject_next_epoch_blob_limit_at_epoch_end                   OK
++ eip8321 - gossip_beacon_block__reject_parent_failed_validation                             OK
++ eip8321 - gossip_beacon_block__reject_slot_not_higher_than_parent                          OK
++ eip8321 - gossip_beacon_block__reject_too_many_attestations                                OK
++ eip8321 - gossip_beacon_block__reject_too_many_attester_slashings                          OK
++ eip8321 - gossip_beacon_block__reject_too_many_blob_commitments                            OK
++ eip8321 - gossip_beacon_block__reject_too_many_bls_to_execution_changes                    OK
++ eip8321 - gossip_beacon_block__reject_too_many_kzg_commitments                             OK
++ eip8321 - gossip_beacon_block__reject_too_many_parent_builder_deposit_requests             OK
++ eip8321 - gossip_beacon_block__reject_too_many_parent_builder_exit_requests                OK
++ eip8321 - gossip_beacon_block__reject_too_many_parent_consolidation_requests               OK
++ eip8321 - gossip_beacon_block__reject_too_many_parent_withdrawal_requests                  OK
++ eip8321 - gossip_beacon_block__reject_too_many_payload_attestations                        OK
++ eip8321 - gossip_beacon_block__reject_too_many_proposer_slashings                          OK
++ eip8321 - gossip_beacon_block__reject_too_many_voluntary_exits                             OK
++ eip8321 - gossip_beacon_block__reject_wrong_proposer_index                                 OK
++ eip8321 - gossip_beacon_block__valid_at_blob_parameters_limit                              OK
++ eip8321 - gossip_beacon_block__valid_block                                                 OK
++ eip8321 - gossip_beacon_block__valid_execution_enabled                                     OK
++ eip8321 - gossip_beacon_block__valid_max_attestations                                      OK
++ eip8321 - gossip_beacon_block__valid_max_attester_slashings                                OK
++ eip8321 - gossip_beacon_block__valid_max_bls_to_execution_changes                          OK
++ eip8321 - gossip_beacon_block__valid_max_parent_builder_deposit_requests                   OK
++ eip8321 - gossip_beacon_block__valid_max_parent_builder_exit_requests                      OK
++ eip8321 - gossip_beacon_block__valid_max_parent_consolidation_requests                     OK
++ eip8321 - gossip_beacon_block__valid_max_parent_withdrawal_requests                        OK
++ eip8321 - gossip_beacon_block__valid_max_payload_attestations                              OK
++ eip8321 - gossip_beacon_block__valid_max_proposer_slashings                                OK
++ eip8321 - gossip_beacon_block__valid_max_voluntary_exits                                   OK
++ eip8321 - gossip_beacon_block__valid_parent_empty                                          OK
++ eip8321 - gossip_beacon_block__valid_parent_full                                           OK
++ eip8321 - gossip_beacon_block__valid_previous_epoch_blob_limit_plus_one_at_epoch_start     OK
++ eip8321 - gossip_beacon_block__valid_with_blob_kzg_commitments                             OK
++ eip8321 - gossip_beacon_block__valid_within_clock_disparity                                OK
 + fulu - gossip_beacon_block__ignore_already_seen_proposer_slot                              OK
 + fulu - gossip_beacon_block__ignore_future_slot                                             OK
 + fulu - gossip_beacon_block__ignore_parent_consensus_failed_execution_known                 OK
@@ -4407,6 +5100,16 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Data Column Sidecar [Preset: minimal]
 ```diff
++ eip8321 - gossip_data_column_sidecar__ignore_already_seen                                  OK
++ eip8321 - gossip_data_column_sidecar__ignore_block_unseen                                  OK
++ eip8321 - gossip_data_column_sidecar__ignore_future_slot                                   OK
++ eip8321 - gossip_data_column_sidecar__reject_block_failed_validation                       OK
++ eip8321 - gossip_data_column_sidecar__reject_invalid_kzg_proofs                            OK
++ eip8321 - gossip_data_column_sidecar__reject_invalid_sidecar                               OK
++ eip8321 - gossip_data_column_sidecar__reject_slot_mismatch                                 OK
++ eip8321 - gossip_data_column_sidecar__reject_wrong_subnet                                  OK
++ eip8321 - gossip_data_column_sidecar__valid                                                OK
++ eip8321 - gossip_data_column_sidecar__valid_slot_within_clock_disparity                    OK
 + fulu - gossip_data_column_sidecar__ignore_already_seen                                     OK
 + fulu - gossip_data_column_sidecar__ignore_future_slot                                      OK
 + fulu - gossip_data_column_sidecar__ignore_not_later_than_finalized_slot                    OK
@@ -4494,6 +5197,26 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Execution Payload Envelope [Preset: minimal]
 ```diff
++ eip8321 - gossip_execution_payload_envelope__ignore_block_unseen                           OK
++ eip8321 - gossip_execution_payload_envelope__ignore_duplicate                              OK
++ eip8321 - gossip_execution_payload_envelope__ignore_pre_finalized                          OK
++ eip8321 - gossip_execution_payload_envelope__reject_block_failed_validation                OK
++ eip8321 - gossip_execution_payload_envelope__reject_block_hash_mismatch                    OK
++ eip8321 - gossip_execution_payload_envelope__reject_builder_index_mismatch                 OK
++ eip8321 - gossip_execution_payload_envelope__reject_execution_requests_root_mismatch       OK
++ eip8321 - gossip_execution_payload_envelope__reject_invalid_signature                      OK
++ eip8321 - gossip_execution_payload_envelope__reject_slot_mismatch                          OK
++ eip8321 - gossip_execution_payload_envelope__reject_too_many_builder_deposit_requests      OK
++ eip8321 - gossip_execution_payload_envelope__reject_too_many_builder_exit_requests         OK
++ eip8321 - gossip_execution_payload_envelope__reject_too_many_consolidation_requests        OK
++ eip8321 - gossip_execution_payload_envelope__reject_too_many_withdrawal_requests           OK
++ eip8321 - gossip_execution_payload_envelope__reject_too_many_withdrawals                   OK
++ eip8321 - gossip_execution_payload_envelope__valid                                         OK
++ eip8321 - gossip_execution_payload_envelope__valid_max_builder_deposit_requests            OK
++ eip8321 - gossip_execution_payload_envelope__valid_max_builder_exit_requests               OK
++ eip8321 - gossip_execution_payload_envelope__valid_max_consolidation_requests              OK
++ eip8321 - gossip_execution_payload_envelope__valid_max_withdrawal_requests                 OK
++ eip8321 - gossip_execution_payload_envelope__valid_max_withdrawals                         OK
 + gloas - gossip_execution_payload_envelope__ignore_block_unseen                             OK
 + gloas - gossip_execution_payload_envelope__ignore_duplicate                                OK
 + gloas - gossip_execution_payload_envelope__ignore_pre_finalized                            OK
@@ -4537,6 +5260,31 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Inclusion List [Preset: minimal]
 ```diff
++ eip8321 - gossip_inclusion_list__ignore_dependent_block_not_possible                       OK
++ eip8321 - gossip_inclusion_list__ignore_dependent_block_state_unavailable                  OK
++ eip8321 - gossip_inclusion_list__ignore_dependent_block_unseen                             OK
++ eip8321 - gossip_inclusion_list__ignore_not_current_slot                                   OK
++ eip8321 - gossip_inclusion_list__ignore_slot_outside_lower_disparity                       OK
++ eip8321 - gossip_inclusion_list__ignore_slot_outside_upper_disparity                       OK
++ eip8321 - gossip_inclusion_list__ignore_third_message_from_validator                       OK
++ eip8321 - gossip_inclusion_list__ignore_transactions_empty                                 OK
++ eip8321 - gossip_inclusion_list__reject_dependent_block_at_lookahead_epoch_start           OK
++ eip8321 - gossip_inclusion_list__reject_empty_transaction                                  OK
++ eip8321 - gossip_inclusion_list__reject_includer_not_in_committee                          OK
++ eip8321 - gossip_inclusion_list__reject_invalid_signature                                  OK
++ eip8321 - gossip_inclusion_list__reject_non_genesis_dependent_root_at_lookahead_epoch      OK
++ eip8321 - gossip_inclusion_list__reject_non_genesis_dependent_root_in_genesis_epoch        OK
++ eip8321 - gossip_inclusion_list__reject_transactions_too_large                             OK
++ eip8321 - gossip_inclusion_list__reject_transactions_too_large_multiple_transactions       OK
++ eip8321 - gossip_inclusion_list__valid                                                     OK
++ eip8321 - gossip_inclusion_list__valid_dependent_block_across_empty_epochs                 OK
++ eip8321 - gossip_inclusion_list__valid_dependent_block_is_head                             OK
++ eip8321 - gossip_inclusion_list__valid_dependent_block_on_fork                             OK
++ eip8321 - gossip_inclusion_list__valid_genesis_dependent_root_at_lookahead_epoch           OK
++ eip8321 - gossip_inclusion_list__valid_genesis_dependent_root_in_genesis_epoch             OK
++ eip8321 - gossip_inclusion_list__valid_slot_at_lower_disparity                             OK
++ eip8321 - gossip_inclusion_list__valid_slot_at_upper_disparity                             OK
++ eip8321 - gossip_inclusion_list__valid_transactions_at_size_limit                          OK
 + heze - gossip_inclusion_list__ignore_dependent_block_not_possible                          OK
 + heze - gossip_inclusion_list__ignore_dependent_block_state_unavailable                     OK
 + heze - gossip_inclusion_list__ignore_dependent_block_unseen                                OK
@@ -4565,6 +5313,19 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Payload Attestation Message [Preset: minimal]
 ```diff
++ eip8321 - gossip_payload_attestation_message__ignore_block_not_at_assigned_slot            OK
++ eip8321 - gossip_payload_attestation_message__ignore_block_unseen                          OK
++ eip8321 - gossip_payload_attestation_message__ignore_duplicate                             OK
++ eip8321 - gossip_payload_attestation_message__ignore_not_current_slot                      OK
++ eip8321 - gossip_payload_attestation_message__ignore_slot_outside_lower_disparity          OK
++ eip8321 - gossip_payload_attestation_message__ignore_slot_outside_upper_disparity          OK
++ eip8321 - gossip_payload_attestation_message__reject_block_failed_validation               OK
++ eip8321 - gossip_payload_attestation_message__reject_invalid_signature                     OK
++ eip8321 - gossip_payload_attestation_message__reject_validator_index_out_of_range          OK
++ eip8321 - gossip_payload_attestation_message__reject_validator_not_in_ptc                  OK
++ eip8321 - gossip_payload_attestation_message__valid                                        OK
++ eip8321 - gossip_payload_attestation_message__valid_slot_at_lower_disparity                OK
++ eip8321 - gossip_payload_attestation_message__valid_slot_at_upper_disparity                OK
 + gloas - gossip_payload_attestation_message__ignore_block_not_at_assigned_slot              OK
 + gloas - gossip_payload_attestation_message__ignore_block_unseen                            OK
 + gloas - gossip_payload_attestation_message__ignore_duplicate                               OK
@@ -4594,6 +5355,30 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Proposer Preferences [Preset: minimal]
 ```diff
++ eip8321 - gossip_proposer_preferences__ignore_dependent_block_not_possible                 OK
++ eip8321 - gossip_proposer_preferences__ignore_dependent_block_state_unavailable            OK
++ eip8321 - gossip_proposer_preferences__ignore_dependent_block_unseen                       OK
++ eip8321 - gossip_proposer_preferences__ignore_duplicate                                    OK
++ eip8321 - gossip_proposer_preferences__ignore_outside_lookahead_disparity                  OK
++ eip8321 - gossip_proposer_preferences__ignore_outside_slot_start_disparity                 OK
++ eip8321 - gossip_proposer_preferences__ignore_slot_after_lookahead                         OK
++ eip8321 - gossip_proposer_preferences__ignore_slot_before_lookahead                        OK
++ eip8321 - gossip_proposer_preferences__ignore_slot_from_past_epoch                         OK
++ eip8321 - gossip_proposer_preferences__reject_dependent_block_at_lookahead_epoch_start     OK
++ eip8321 - gossip_proposer_preferences__reject_invalid_signature                            OK
++ eip8321 - gossip_proposer_preferences__reject_non_genesis_dependent_root_at_lookahead_epoc OK
++ eip8321 - gossip_proposer_preferences__reject_non_genesis_dependent_root_in_genesis_epoch  OK
++ eip8321 - gossip_proposer_preferences__reject_wrong_proposer                               OK
++ eip8321 - gossip_proposer_preferences__valid                                               OK
++ eip8321 - gossip_proposer_preferences__valid_at_first_lookahead_slot                       OK
++ eip8321 - gossip_proposer_preferences__valid_at_last_lookahead_slot                        OK
++ eip8321 - gossip_proposer_preferences__valid_at_lookahead_disparity_edge                   OK
++ eip8321 - gossip_proposer_preferences__valid_at_slot_start_disparity_edge                  OK
++ eip8321 - gossip_proposer_preferences__valid_dependent_block_across_empty_epochs           OK
++ eip8321 - gossip_proposer_preferences__valid_dependent_block_is_head                       OK
++ eip8321 - gossip_proposer_preferences__valid_dependent_block_on_fork                       OK
++ eip8321 - gossip_proposer_preferences__valid_genesis_dependent_root_at_lookahead_epoch     OK
++ eip8321 - gossip_proposer_preferences__valid_genesis_dependent_root_in_genesis_epoch       OK
 + gloas - gossip_proposer_preferences__ignore_dependent_block_not_possible                   OK
 + gloas - gossip_proposer_preferences__ignore_dependent_block_state_unavailable              OK
 + gloas - gossip_proposer_preferences__ignore_dependent_block_unseen                         OK
@@ -4647,6 +5432,15 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Proposer Slashing [Preset: minimal]
 ```diff
++ eip8321 - gossip_proposer_slashing__ignore_already_seen                                    OK
++ eip8321 - gossip_proposer_slashing__reject_headers_identical                               OK
++ eip8321 - gossip_proposer_slashing__reject_invalid_signature_1                             OK
++ eip8321 - gossip_proposer_slashing__reject_invalid_signature_2                             OK
++ eip8321 - gossip_proposer_slashing__reject_proposer_index_out_of_range                     OK
++ eip8321 - gossip_proposer_slashing__reject_proposer_indices_not_matching                   OK
++ eip8321 - gossip_proposer_slashing__reject_proposer_not_slashable                          OK
++ eip8321 - gossip_proposer_slashing__reject_slots_not_matching                              OK
++ eip8321 - gossip_proposer_slashing__valid                                                  OK
 + fulu - gossip_proposer_slashing__ignore_already_seen                                       OK
 + fulu - gossip_proposer_slashing__reject_headers_identical                                  OK
 + fulu - gossip_proposer_slashing__reject_invalid_signature_1                                OK
@@ -4675,8 +5469,34 @@ ConsensusSpecPreset-minimal
 + heze - gossip_proposer_slashing__reject_slots_not_matching                                 OK
 + heze - gossip_proposer_slashing__valid                                                     OK
 ```
+## EF - Networking - Gossip - RANDAO Commitment Registration [Preset: minimal]
+```diff
++ eip8321 - gossip_randao_commitment_registration__ignore_already_pending                    OK
++ eip8321 - gossip_randao_commitment_registration__ignore_already_registered                 OK
+  eip8321 - gossip_randao_commitment_registration__ignore_already_seen                       Skip
+  eip8321 - gossip_randao_commitment_registration__ignore_pre_eip8321_head_state             Skip
++ eip8321 - gossip_randao_commitment_registration__reject_invalid_signature                  OK
++ eip8321 - gossip_randao_commitment_registration__reject_validator_index_out_of_range       OK
++ eip8321 - gossip_randao_commitment_registration__reject_zero_commitment                    OK
++ eip8321 - gossip_randao_commitment_registration__valid                                     OK
+  eip8321 - gossip_randao_commitment_registration__valid_post_eip8321_head_state             Skip
+```
 ## EF - Networking - Gossip - Sync Committee Contribution And Proof [Preset: minimal]
 ```diff
++ eip8321 - gossip_sync_committee_contribution_and_proof__ignore_duplicate_aggregator        OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__ignore_future_slot                 OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__ignore_past_slot                   OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__ignore_superset_contribution       OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_aggregator_index_out_of_ran OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_aggregator_not_in_subcommit OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_invalid_aggregate_signature OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_invalid_aggregator_signatur OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_invalid_selection_proof     OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_invalid_subcommittee_index  OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__reject_no_participants             OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__valid                              OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__valid_at_period_boundary           OK
++ eip8321 - gossip_sync_committee_contribution_and_proof__valid_non_superset_contribution    OK
 + fulu - gossip_sync_committee_contribution_and_proof__ignore_duplicate_aggregator           OK
 + fulu - gossip_sync_committee_contribution_and_proof__ignore_future_slot                    OK
 + fulu - gossip_sync_committee_contribution_and_proof__ignore_past_slot                      OK
@@ -4722,6 +5542,13 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Sync Committee Message [Preset: minimal]
 ```diff
++ eip8321 - gossip_sync_committee_message__ignore_duplicate                                  OK
++ eip8321 - gossip_sync_committee_message__ignore_future_slot                                OK
++ eip8321 - gossip_sync_committee_message__ignore_past_slot                                  OK
++ eip8321 - gossip_sync_committee_message__reject_invalid_signature                          OK
++ eip8321 - gossip_sync_committee_message__reject_validator_index_out_of_range               OK
++ eip8321 - gossip_sync_committee_message__reject_wrong_subnet                               OK
++ eip8321 - gossip_sync_committee_message__valid                                             OK
 + fulu - gossip_sync_committee_message__ignore_duplicate                                     OK
 + fulu - gossip_sync_committee_message__ignore_future_slot                                   OK
 + fulu - gossip_sync_committee_message__ignore_past_slot                                     OK
@@ -4746,6 +5573,20 @@ ConsensusSpecPreset-minimal
 ```
 ## EF - Networking - Gossip - Voluntary Exit [Preset: minimal]
 ```diff
++ eip8321 - gossip_voluntary_exit__ignore_already_initiated_exit                             OK
++ eip8321 - gossip_voluntary_exit__ignore_already_seen                                       OK
++ eip8321 - gossip_voluntary_exit__ignore_before_clock_disparity                             OK
++ eip8321 - gossip_voluntary_exit__ignore_epoch_in_future                                    OK
++ eip8321 - gossip_voluntary_exit__ignore_far_future_epoch                                   OK
++ eip8321 - gossip_voluntary_exit__reject_deneb_signature                                    OK
++ eip8321 - gossip_voluntary_exit__reject_invalid_signature                                  OK
++ eip8321 - gossip_voluntary_exit__reject_not_active_long_enough                             OK
++ eip8321 - gossip_voluntary_exit__reject_validator_index_out_of_range                       OK
++ eip8321 - gossip_voluntary_exit__reject_validator_not_active                               OK
++ eip8321 - gossip_voluntary_exit__valid                                                     OK
++ eip8321 - gossip_voluntary_exit__valid_at_clock_disparity                                  OK
++ eip8321 - gossip_voluntary_exit__valid_capella_signature                                   OK
++ eip8321 - gossip_voluntary_exit__valid_previous_epoch                                      OK
 + fulu - gossip_voluntary_exit__ignore_already_initiated_exit                                OK
 + fulu - gossip_voluntary_exit__ignore_already_seen                                          OK
 + fulu - gossip_voluntary_exit__ignore_before_clock_disparity                                OK
@@ -6013,6 +6854,378 @@ ConsensusSpecPreset-minimal
 + [Valid]   EF - deneb - Sanity - Blocks - voluntary_exit [Preset: minimal]                  OK
 + [Valid]   EF - deneb - Sanity - Blocks - withdrawal_success_two_blocks [Preset: minimal]   OK
 + [Valid]   EF - deneb - Sanity - Blocks - zero_blob [Preset: minimal]                       OK
+```
+## EF - eip8321 - Epoch Processing - Builder pending payments [Preset: minimal]
+```diff
++ Builder pending payments - process_builder_pending_payments_above_quorum [Preset: minimal] OK
++ Builder pending payments - process_builder_pending_payments_below_quorum [Preset: minimal] OK
++ Builder pending payments - process_builder_pending_payments_empty_queue [Preset: minimal]  OK
++ Builder pending payments - process_builder_pending_payments_equal_quorum [Preset: minimal] OK
++ Builder pending payments - process_builder_pending_payments_mixed_weights [Preset: minimal OK
++ Builder pending payments - process_builder_pending_payments_multiple_above_quorum [Preset: OK
++ Builder pending payments - process_builder_pending_payments_queue_rotation [Preset: minima OK
+```
+## EF - eip8321 - Epoch Processing - Effective balance updates [Preset: minimal]
+```diff
++ Effective balance updates - effective_balance_hysteresis [Preset: minimal]                 OK
++ Effective balance updates - effective_balance_hysteresis_with_compounding_credentials [Pre OK
+```
+## EF - eip8321 - Epoch Processing - Historical summaries update [Preset: minimal]
+```diff
++ Historical summaries update - historical_summaries_accumulator [Preset: minimal]           OK
+```
+## EF - eip8321 - Epoch Processing - Inactivity [Preset: minimal]
+```diff
++ Inactivity - all_zero_inactivity_scores_empty_participation [Preset: minimal]              OK
++ Inactivity - all_zero_inactivity_scores_empty_participation_leaking [Preset: minimal]      OK
++ Inactivity - all_zero_inactivity_scores_full_participation [Preset: minimal]               OK
++ Inactivity - all_zero_inactivity_scores_full_participation_leaking [Preset: minimal]       OK
++ Inactivity - all_zero_inactivity_scores_random_participation [Preset: minimal]             OK
++ Inactivity - all_zero_inactivity_scores_random_participation_leaking [Preset: minimal]     OK
++ Inactivity - genesis [Preset: minimal]                                                     OK
++ Inactivity - genesis_random_scores [Preset: minimal]                                       OK
++ Inactivity - random_inactivity_scores_empty_participation [Preset: minimal]                OK
++ Inactivity - random_inactivity_scores_empty_participation_leaking [Preset: minimal]        OK
++ Inactivity - random_inactivity_scores_full_participation [Preset: minimal]                 OK
++ Inactivity - random_inactivity_scores_full_participation_leaking [Preset: minimal]         OK
++ Inactivity - random_inactivity_scores_random_participation [Preset: minimal]               OK
++ Inactivity - random_inactivity_scores_random_participation_leaking [Preset: minimal]       OK
++ Inactivity - randomized_state [Preset: minimal]                                            OK
++ Inactivity - randomized_state_leaking [Preset: minimal]                                    OK
++ Inactivity - some_exited_full_random_leaking [Preset: minimal]                             OK
++ Inactivity - some_slashed_full_random [Preset: minimal]                                    OK
++ Inactivity - some_slashed_full_random_leaking [Preset: minimal]                            OK
++ Inactivity - some_slashed_zero_scores_full_participation [Preset: minimal]                 OK
++ Inactivity - some_slashed_zero_scores_full_participation_leaking [Preset: minimal]         OK
+```
+## EF - eip8321 - Epoch Processing - Justification & Finalization [Preset: minimal]
+```diff
++ Justification & Finalization - 123_ok_support [Preset: minimal]                            OK
++ Justification & Finalization - 123_poor_support [Preset: minimal]                          OK
++ Justification & Finalization - 12_ok_support [Preset: minimal]                             OK
++ Justification & Finalization - 12_ok_support_messed_target [Preset: minimal]               OK
++ Justification & Finalization - 12_poor_support [Preset: minimal]                           OK
++ Justification & Finalization - 234_ok_support [Preset: minimal]                            OK
++ Justification & Finalization - 234_poor_support [Preset: minimal]                          OK
++ Justification & Finalization - 23_ok_support [Preset: minimal]                             OK
++ Justification & Finalization - 23_poor_support [Preset: minimal]                           OK
++ Justification & Finalization - balance_threshold_with_exited_validators [Preset: minimal]  OK
+```
+## EF - eip8321 - Epoch Processing - PTC window [Preset: minimal]
+```diff
++ PTC window - process_ptc_window__shifts_all_epochs [Preset: minimal]                       OK
+```
+## EF - eip8321 - Epoch Processing - Participation flag updates [Preset: minimal]
+```diff
++ Participation flag updates - all_zeroed [Preset: minimal]                                  OK
++ Participation flag updates - current_epoch_zeroed [Preset: minimal]                        OK
++ Participation flag updates - current_filled [Preset: minimal]                              OK
++ Participation flag updates - filled [Preset: minimal]                                      OK
++ Participation flag updates - large_random [Preset: minimal]                                OK
++ Participation flag updates - previous_epoch_zeroed [Preset: minimal]                       OK
++ Participation flag updates - previous_filled [Preset: minimal]                             OK
++ Participation flag updates - random_0 [Preset: minimal]                                    OK
++ Participation flag updates - random_1 [Preset: minimal]                                    OK
++ Participation flag updates - random_2 [Preset: minimal]                                    OK
++ Participation flag updates - random_genesis [Preset: minimal]                              OK
++ Participation flag updates - slightly_larger_random [Preset: minimal]                      OK
+```
+## EF - eip8321 - Epoch Processing - Pending RANDAO commitments [Preset: minimal]
+```diff
++ Pending RANDAO commitments - activate_at_next_epoch [Preset: minimal]                      OK
++ Pending RANDAO commitments - activate_overdue [Preset: minimal]                            OK
++ Pending RANDAO commitments - drain_prefix_only [Preset: minimal]                           OK
++ Pending RANDAO commitments - no_pending_commitments [Preset: minimal]                      OK
++ Pending RANDAO commitments - not_yet_activated [Preset: minimal]                           OK
+```
+## EF - eip8321 - Epoch Processing - Pending consolidations [Preset: minimal]
+```diff
++ Pending consolidations - all_consolidation_cases_together [Preset: minimal]                OK
++ Pending consolidations - basic_pending_consolidation [Preset: minimal]                     OK
++ Pending consolidations - consolidation_not_yet_withdrawable_validator [Preset: minimal]    OK
++ Pending consolidations - pending_consolidation_balance_computation_compounding [Preset: mi OK
++ Pending consolidations - pending_consolidation_balance_computation_eth1 [Preset: minimal]  OK
++ Pending consolidations - pending_consolidation_compounding_creds [Preset: minimal]         OK
++ Pending consolidations - pending_consolidation_future_epoch [Preset: minimal]              OK
++ Pending consolidations - pending_consolidation_source_balance_greater_than_max_effective [ OK
++ Pending consolidations - pending_consolidation_source_balance_greater_than_max_effective_c OK
++ Pending consolidations - pending_consolidation_source_balance_less_than_max_effective [Pre OK
++ Pending consolidations - pending_consolidation_source_balance_less_than_max_effective_comp OK
++ Pending consolidations - pending_consolidation_with_pending_deposit [Preset: minimal]      OK
++ Pending consolidations - skip_consolidation_when_source_slashed [Preset: minimal]          OK
+```
+## EF - eip8321 - Epoch Processing - Pending deposits [Preset: minimal]
+```diff
++ Pending deposits - apply_pending_deposit_compounding_withdrawal_credentials_max [Preset: m OK
++ Pending deposits - apply_pending_deposit_compounding_withdrawal_credentials_over_max [Pres OK
++ Pending deposits - apply_pending_deposit_compounding_withdrawal_credentials_over_max_next_ OK
++ Pending deposits - apply_pending_deposit_compounding_withdrawal_credentials_under_max [Pre OK
++ Pending deposits - apply_pending_deposit_correct_sig_but_forked_state [Preset: minimal]    OK
++ Pending deposits - apply_pending_deposit_effective_deposit_with_genesis_fork_version [Pres OK
++ Pending deposits - apply_pending_deposit_eth1_withdrawal_credentials [Preset: minimal]     OK
++ Pending deposits - apply_pending_deposit_incorrect_sig_new_deposit [Preset: minimal]       OK
++ Pending deposits - apply_pending_deposit_incorrect_sig_top_up [Preset: minimal]            OK
++ Pending deposits - apply_pending_deposit_incorrect_withdrawal_credentials_top_up [Preset:  OK
++ Pending deposits - apply_pending_deposit_ineffective_deposit_with_bad_fork_version [Preset OK
++ Pending deposits - apply_pending_deposit_key_validate_invalid_decompression [Preset: minim OK
++ Pending deposits - apply_pending_deposit_key_validate_invalid_identity [Preset: minimal]   OK
++ Pending deposits - apply_pending_deposit_key_validate_invalid_not_on_curve [Preset: minima OK
++ Pending deposits - apply_pending_deposit_key_validate_invalid_subgroup [Preset: minimal]   OK
++ Pending deposits - apply_pending_deposit_min_activation [Preset: minimal]                  OK
++ Pending deposits - apply_pending_deposit_non_versioned_withdrawal_credentials [Preset: min OK
++ Pending deposits - apply_pending_deposit_non_versioned_withdrawal_credentials_over_min_act OK
++ Pending deposits - apply_pending_deposit_over_min_activation [Preset: minimal]             OK
++ Pending deposits - apply_pending_deposit_over_min_activation_next_increment [Preset: minim OK
++ Pending deposits - apply_pending_deposit_success_top_up_to_withdrawn_validator [Preset: mi OK
++ Pending deposits - apply_pending_deposit_top_up__less_effective_balance [Preset: minimal]  OK
++ Pending deposits - apply_pending_deposit_top_up__max_effective_balance_compounding [Preset OK
++ Pending deposits - apply_pending_deposit_top_up__min_activation_balance [Preset: minimal]  OK
++ Pending deposits - apply_pending_deposit_top_up__min_activation_balance_compounding [Prese OK
++ Pending deposits - apply_pending_deposit_under_min_activation [Preset: minimal]            OK
++ Pending deposits - apply_pending_deposit_with_previous_fork_version [Preset: minimal]      OK
++ Pending deposits - bls_withdrawal_credentials_followed_by_eth1_deposit [Preset: minimal]   OK
++ Pending deposits - bls_withdrawal_credentials_top_up_invalid_signature [Preset: minimal]   OK
++ Pending deposits - bls_withdrawal_credentials_top_up_valid_signature [Preset: minimal]     OK
++ Pending deposits - ineffective_deposit_with_current_fork_version [Preset: minimal]         OK
++ Pending deposits - new_bls_withdrawal_credentials_invalid_signature [Preset: minimal]      OK
++ Pending deposits - new_bls_withdrawal_credentials_valid_signature [Preset: minimal]        OK
++ Pending deposits - process_pending_deposits__builder_deposit_domain [Preset: minimal]      OK
++ Pending deposits - process_pending_deposits_balance_above_churn [Preset: minimal]          OK
++ Pending deposits - process_pending_deposits_balance_equal_churn [Preset: minimal]          OK
++ Pending deposits - process_pending_deposits_limit_is_reached [Preset: minimal]             OK
++ Pending deposits - process_pending_deposits_mixture_of_skipped_and_above_churn [Preset: mi OK
++ Pending deposits - process_pending_deposits_multiple_for_new_validator [Preset: minimal]   OK
++ Pending deposits - process_pending_deposits_multiple_pending_deposits_above_churn [Preset: OK
++ Pending deposits - process_pending_deposits_multiple_pending_deposits_below_churn [Preset: OK
++ Pending deposits - process_pending_deposits_multiple_pending_one_skipped [Preset: minimal] OK
++ Pending deposits - process_pending_deposits_multiple_skipped_deposits_exiting_validators [ OK
++ Pending deposits - process_pending_deposits_not_finalized [Preset: minimal]                OK
++ Pending deposits - process_pending_deposits_preexisting_churn [Preset: minimal]            OK
++ Pending deposits - process_pending_deposits_scaled_churn [Preset: minimal]                 OK
++ Pending deposits - process_pending_deposits_skipped_deposit_exiting_validator [Preset: min OK
++ Pending deposits - process_pending_deposits_withdrawable_validator [Preset: minimal]       OK
++ Pending deposits - process_pending_deposits_withdrawable_validator_not_churned [Preset: mi OK
+```
+## EF - eip8321 - Epoch Processing - Pending deposits churn [Preset: minimal]
+```diff
++ Pending deposits churn - activation_churn__equal_to_cap [Preset: minimal]                  OK
++ Pending deposits churn - activation_churn__greater_than_cap [Preset: minimal]              OK
++ Pending deposits churn - activation_churn__less_than_cap [Preset: minimal]                 OK
++ Pending deposits churn - deposit_above_activation_churn_not_processed [Preset: minimal]    OK
+```
+## EF - eip8321 - Epoch Processing - Proposer lookahead [Preset: minimal]
+```diff
++ Proposer lookahead - proposer_lookahead_does_not_contain_exited_validators [Preset: minima OK
++ Proposer lookahead - proposer_lookahead_does_not_contain_slashed_validators [Preset: minim OK
++ Proposer lookahead - proposer_lookahead_full_with_many_slashed_validators [Preset: minimal OK
++ Proposer lookahead - proposer_lookahead_in_state_matches_computed_lookahead [Preset: minim OK
+```
+## EF - eip8321 - Epoch Processing - RANDAO mixes reset [Preset: minimal]
+```diff
++ RANDAO mixes reset - updated_randao_mixes [Preset: minimal]                                OK
+```
+## EF - eip8321 - Epoch Processing - Registry updates [Preset: minimal]
+```diff
++ Registry updates - activation_churn_limit__equal_to_activation_limit [Preset: minimal]     OK
++ Registry updates - activation_churn_limit__greater_than_activation_limit [Preset: minimal] OK
++ Registry updates - activation_churn_limit__less_than_activation_limit [Preset: minimal]    OK
++ Registry updates - activation_queue_activation_and_ejection__1 [Preset: minimal]           OK
++ Registry updates - activation_queue_activation_and_ejection__churn_limit [Preset: minimal] OK
++ Registry updates - activation_queue_activation_and_ejection__exceed_churn_limit [Preset: m OK
++ Registry updates - activation_queue_activation_and_ejection__exceed_scaled_churn_limit [Pr OK
++ Registry updates - activation_queue_activation_and_ejection__scaled_churn_limit [Preset: m OK
++ Registry updates - activation_queue_efficiency_min [Preset: minimal]                       OK
++ Registry updates - activation_queue_efficiency_scaled [Preset: minimal]                    OK
++ Registry updates - activation_queue_eligibility__greater_than_min_activation_balance [Pres OK
++ Registry updates - activation_queue_eligibility__less_than_min_activation_balance [Preset: OK
++ Registry updates - activation_queue_eligibility__min_activation_balance [Preset: minimal]  OK
++ Registry updates - activation_queue_eligibility__min_activation_balance_compounding_creds  OK
++ Registry updates - activation_queue_eligibility__min_activation_balance_eth1_creds [Preset OK
++ Registry updates - activation_queue_no_activation_no_finality [Preset: minimal]            OK
++ Registry updates - activation_queue_sorting [Preset: minimal]                              OK
++ Registry updates - activation_queue_to_activated_if_finalized [Preset: minimal]            OK
++ Registry updates - add_to_activation_queue [Preset: minimal]                               OK
++ Registry updates - ejection [Preset: minimal]                                              OK
++ Registry updates - ejection_past_churn_limit_min [Preset: minimal]                         OK
++ Registry updates - ejection_past_churn_limit_scaled [Preset: minimal]                      OK
++ Registry updates - invalid_large_withdrawable_epoch [Preset: minimal]                      OK
+```
+## EF - eip8321 - Epoch Processing - Rewards and penalties [Preset: minimal]
+```diff
++ Rewards and penalties - almost_empty_attestations [Preset: minimal]                        OK
++ Rewards and penalties - almost_empty_attestations_with_leak [Preset: minimal]              OK
++ Rewards and penalties - almost_full_attestations [Preset: minimal]                         OK
++ Rewards and penalties - almost_full_attestations_with_leak [Preset: minimal]               OK
++ Rewards and penalties - attestations_some_slashed [Preset: minimal]                        OK
++ Rewards and penalties - duplicate_attestation [Preset: minimal]                            OK
++ Rewards and penalties - full_attestation_participation [Preset: minimal]                   OK
++ Rewards and penalties - full_attestation_participation_with_leak [Preset: minimal]         OK
++ Rewards and penalties - full_attestations_default_balances_except_a_validator_with_one_gwe OK
++ Rewards and penalties - full_attestations_misc_balances [Preset: minimal]                  OK
++ Rewards and penalties - genesis_epoch_full_attestations_no_rewards [Preset: minimal]       OK
++ Rewards and penalties - genesis_epoch_no_attestations_no_penalties [Preset: minimal]       OK
++ Rewards and penalties - no_attestations_all_penalties [Preset: minimal]                    OK
++ Rewards and penalties - random_fill_attestations [Preset: minimal]                         OK
++ Rewards and penalties - random_fill_attestations_with_leak [Preset: minimal]               OK
+```
+## EF - eip8321 - Epoch Processing - Slashings [Preset: minimal]
+```diff
++ Slashings - low_penalty [Preset: minimal]                                                  OK
++ Slashings - max_penalties [Preset: minimal]                                                OK
++ Slashings - minimal_penalty [Preset: minimal]                                              OK
++ Slashings - scaled_penalties [Preset: minimal]                                             OK
++ Slashings - slashings_with_random_state [Preset: minimal]                                  OK
+```
+## EF - eip8321 - Epoch Processing - Slashings reset [Preset: minimal]
+```diff
++ Slashings reset - flush_slashings [Preset: minimal]                                        OK
+```
+## EF - eip8321 - Epoch Processing - Sync committee updates [Preset: minimal]
+```diff
++ Sync committee updates - sync_committees_no_progress_not_at_period_boundary [Preset: minim OK
++ Sync committee updates - sync_committees_progress_genesis [Preset: minimal]                OK
++ Sync committee updates - sync_committees_progress_misc_balances_genesis [Preset: minimal]  OK
++ Sync committee updates - sync_committees_progress_misc_balances_not_genesis [Preset: minim OK
++ Sync committee updates - sync_committees_progress_not_genesis [Preset: minimal]            OK
+```
+## EF - eip8321 - Finality  [Preset: minimal]
+```diff
++ [Valid]   EF - eip8321 - Finality - finality_no_updates_at_genesis [Preset: minimal]       OK
++ [Valid]   EF - eip8321 - Finality - finality_rule_1 [Preset: minimal]                      OK
++ [Valid]   EF - eip8321 - Finality - finality_rule_2 [Preset: minimal]                      OK
++ [Valid]   EF - eip8321 - Finality - finality_rule_3 [Preset: minimal]                      OK
++ [Valid]   EF - eip8321 - Finality - finality_rule_4 [Preset: minimal]                      OK
+```
+## EF - eip8321 - Rewards  [Preset: minimal]
+```diff
++ EF - eip8321 - Rewards - all_balances_too_low_for_reward [Preset: minimal]                 OK
++ EF - eip8321 - Rewards - empty [Preset: minimal]                                           OK
++ EF - eip8321 - Rewards - empty_leak [Preset: minimal]                                      OK
++ EF - eip8321 - Rewards - full_all_correct [Preset: minimal]                                OK
++ EF - eip8321 - Rewards - full_but_partial_participation [Preset: minimal]                  OK
++ EF - eip8321 - Rewards - full_but_partial_participation_leak [Preset: minimal]             OK
++ EF - eip8321 - Rewards - full_leak [Preset: minimal]                                       OK
++ EF - eip8321 - Rewards - full_random_0 [Preset: minimal]                                   OK
++ EF - eip8321 - Rewards - full_random_1 [Preset: minimal]                                   OK
++ EF - eip8321 - Rewards - full_random_2 [Preset: minimal]                                   OK
++ EF - eip8321 - Rewards - full_random_3 [Preset: minimal]                                   OK
++ EF - eip8321 - Rewards - full_random_4 [Preset: minimal]                                   OK
++ EF - eip8321 - Rewards - full_random_leak [Preset: minimal]                                OK
++ EF - eip8321 - Rewards - full_random_low_balances_0 [Preset: minimal]                      OK
++ EF - eip8321 - Rewards - full_random_low_balances_1 [Preset: minimal]                      OK
++ EF - eip8321 - Rewards - full_random_misc_balances [Preset: minimal]                       OK
++ EF - eip8321 - Rewards - full_random_seven_epoch_leak [Preset: minimal]                    OK
++ EF - eip8321 - Rewards - full_random_ten_epoch_leak [Preset: minimal]                      OK
++ EF - eip8321 - Rewards - full_random_without_leak_0 [Preset: minimal]                      OK
++ EF - eip8321 - Rewards - full_random_without_leak_and_current_exit_0 [Preset: minimal]     OK
++ EF - eip8321 - Rewards - half_full [Preset: minimal]                                       OK
++ EF - eip8321 - Rewards - half_full_leak [Preset: minimal]                                  OK
++ EF - eip8321 - Rewards - quarter_full [Preset: minimal]                                    OK
++ EF - eip8321 - Rewards - quarter_full_leak [Preset: minimal]                               OK
++ EF - eip8321 - Rewards - some_very_low_effective_balances_that_attested [Preset: minimal]  OK
++ EF - eip8321 - Rewards - some_very_low_effective_balances_that_attested_leak [Preset: mini OK
++ EF - eip8321 - Rewards - some_very_low_effective_balances_that_did_not_attest [Preset: min OK
++ EF - eip8321 - Rewards - some_very_low_effective_balances_that_did_not_attest_leak [Preset OK
++ EF - eip8321 - Rewards - with_exited_validators [Preset: minimal]                          OK
++ EF - eip8321 - Rewards - with_exited_validators_leak [Preset: minimal]                     OK
++ EF - eip8321 - Rewards - with_not_yet_activated_validators [Preset: minimal]               OK
++ EF - eip8321 - Rewards - with_not_yet_activated_validators_leak [Preset: minimal]          OK
++ EF - eip8321 - Rewards - with_slashed_validators [Preset: minimal]                         OK
++ EF - eip8321 - Rewards - with_slashed_validators_leak [Preset: minimal]                    OK
+```
+## EF - eip8321 - Sanity - Blocks  [Preset: minimal]
+```diff
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_all_zeroed_sig [Preset: minimal]        OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_duplicate_bls_changes_same_block [Prese OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_duplicate_proposer_slashings_same_block OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_duplicate_validator_exit_same_block [Pr OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_incorrect_block_sig [Preset: minimal]   OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_incorrect_proposer_index_sig_from_expec OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_incorrect_proposer_index_sig_from_propo OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_incorrect_state_root [Preset: minimal]  OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_parent_from_same_slot [Preset: minimal] OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_payload_attestation_invalid_signature [ OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_payload_attestation_too_old_slot [Prese OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_payload_attestation_wrong_beacon_block_ OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_prev_slot_block_transition [Preset: min OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_proposer_and_attester_slashings_same_va OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_same_slot_block_transition [Preset: min OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_similar_proposer_slashings_same_block [ OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_attestations [Preset: minimal] OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_attester_slashings [Preset: mi OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_bls_to_execution_changes [Pres OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_payload_attestations [Preset:  OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_proposer_slashings [Preset: mi OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_too_many_voluntary_exits [Preset: minim OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_two_bls_changes_of_different_addresses_ OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - invalid_withdrawal_fail_second_block_payload_is OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - process_parent_execution_payload__wrong_executi OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - slash_and_exit_same_index [Preset: minimal]     OK
++ [Invalid] EF - eip8321 - Sanity - Blocks - voluntary_exit_fails_after_parent_payload_withd OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - activate_and_partial_withdrawal_max_effective_b OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - activate_and_partial_withdrawal_overdeposit [Pr OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - attestation [Preset: minimal]                   OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - attestations_after_missed_slot_use_applied_pare OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - attester_slashing [Preset: minimal]             OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - balance_driven_status_transitions [Preset: mini OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - bls_change [Preset: minimal]                    OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - builder_payment_after_missed_epochs [Preset: mi OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - builder_payment_removed_when_proposer_slashes_i OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - builder_payment_weight_no_double_counting_targe OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - duplicate_attestation_same_block [Preset: minim OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - empty_block_transition [Preset: minimal]        OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - empty_block_transition_large_validator_set [Pre OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - empty_epoch_transition [Preset: minimal]        OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - empty_epoch_transition_large_validator_set [Pre OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - empty_epoch_transition_not_finalizing [Preset:  OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_empty_parent_gap_1_epoch [Preset OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_empty_parent_gap_2_epochs [Prese OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_empty_parent_gap_5_epochs [Prese OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_full_parent_all_requests_gap_5_e OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_full_parent_gap_1_epoch [Preset: OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_full_parent_gap_2_epochs [Preset OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - epoch_boundary_full_parent_gap_5_epochs [Preset OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - exit_and_bls_change [Preset: minimal]           OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - full_random_operations_0 [Preset: minimal]      OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - full_random_operations_1 [Preset: minimal]      OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - full_random_operations_2 [Preset: minimal]      OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - full_random_operations_3 [Preset: minimal]      OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - high_proposer_index [Preset: minimal]           OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - historical_batch [Preset: minimal]              OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - inactivity_scores_full_participation_leaking [P OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - inactivity_scores_leaking [Preset: minimal]     OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - many_partial_withdrawals_in_epoch_transition [P OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_attestations [Preset: minimal]              OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_attester_slashings [Preset: minimal]        OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_bls_to_execution_changes [Preset: minimal]  OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_payload_attestations [Preset: minimal]      OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_proposer_slashings [Preset: minimal]        OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - max_voluntary_exits [Preset: minimal]           OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_next_block_with_withdrawals_sati OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_next_block_with_withdrawals_unsa OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_next_block_without_withdrawals_s OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_next_block_without_withdrawals_u OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_recovery_resumes_with_remaining_ OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - missed_payload_recovery_resumes_without_remaini OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - multiple_different_proposer_slashings_same_bloc OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - multiple_different_validator_exits_same_block [ OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - partial_withdrawal_in_epoch_transition [Preset: OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - proposer_after_inactive_index [Preset: minimal] OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - proposer_and_attester_slashings_partial_overlap OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - proposer_self_slashing [Preset: minimal]        OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - proposer_slashing [Preset: minimal]             OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - randao_commitment_registration_lifecycle [Prese OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - skipped_slots [Preset: minimal]                 OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - slash_and_exit_diff_index [Preset: minimal]     OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - switch_to_compounding_across_epoch_boundary [Pr OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee__empty [Preset: minima OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee__full [Preset: minimal OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee__half [Preset: minimal OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee_genesis__empty [Preset OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee_genesis__full [Preset: OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - sync_committee_committee_genesis__half [Preset: OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - voluntary_exit [Preset: minimal]                OK
++ [Valid]   EF - eip8321 - Sanity - Blocks - withdrawal_success_two_blocks [Preset: minimal] OK
 ```
 ## EF - electra - Epoch Processing - Effective balance updates [Preset: minimal]
 ```diff
