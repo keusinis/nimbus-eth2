@@ -25,7 +25,8 @@ from std/sugar import collect
 from std/sequtils import countIt
 
 proc makePayloadAttestationMessage(
-    state: gloas.HashedBeaconState | heze.HashedBeaconState,
+    state: gloas.HashedBeaconState | heze.HashedBeaconState |
+           eip8321.HashedBeaconState,
     beacon_block_root: Eth2Digest,
     validator_index: ValidatorIndex,
     payload_present: bool = true,

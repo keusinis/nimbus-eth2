@@ -390,7 +390,7 @@ proc addSidecarless(
     quarantine: var Quarantine, finalizedSlot: Opt[Slot],
     signedBlock: deneb.SignedBeaconBlock | electra.SignedBeaconBlock |
                  fulu.SignedBeaconBlock | gloas.SignedBeaconBlock |
-                 heze.SignedBeaconBlock
+                 heze.SignedBeaconBlock | eip8321.SignedBeaconBlock
 ): bool =
   if finalizedSlot.isSome():
     if signedBlock.message.isUnviableFork(finalizedSlot.get()):
@@ -410,7 +410,7 @@ proc addSidecarless*(
   quarantine: var Quarantine, finalizedSlot: Slot,
   signedBlock: deneb.SignedBeaconBlock | electra.SignedBeaconBlock |
                fulu.SignedBeaconBlock | gloas.SignedBeaconBlock |
-               heze.SignedBeaconBlock
+               heze.SignedBeaconBlock | eip8321.SignedBeaconBlock
 ): bool =
   quarantine.addSidecarless(Opt.some(finalizedSlot), signedBlock)
 
@@ -418,7 +418,7 @@ proc addSidecarless*(
   quarantine: var Quarantine,
   signedBlock: deneb.SignedBeaconBlock | electra.SignedBeaconBlock |
                fulu.SignedBeaconBlock | gloas.SignedBeaconBlock |
-               heze.SignedBeaconBlock
+               heze.SignedBeaconBlock | eip8321.SignedBeaconBlock
 ) =
   discard quarantine.addSidecarless(Opt.none(Slot), signedBlock)
 

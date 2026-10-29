@@ -251,7 +251,7 @@ proc attemptGetBlobs*(
         self.fuluColumnQuarantine[].popSidecarsForImport(forkyBlck.root)
 
       self.blockProcessor.enqueueBlock(MsgSource.gossip, forkyBlck, sidecarsOpt)
-    elif consensusFork == ConsensusFork.Heze:
+    elif consensusFork in [ConsensusFork.Heze, ConsensusFork.Eip8321]:
       debugHezeComment "EL engine_getBlobs dispatch not yet wired for Heze"
     else:
       discard

@@ -276,7 +276,7 @@ proc processSlot(
   ## *current* canonical chain. The canonical block is read fresh each call, so
   ## a reorg that re-mapped this slot is handled implicitly.
   let blockFork = self.dag.cfg.consensusForkAtEpoch(slot.epoch)
-  static: doAssert high(ConsensusFork) == ConsensusFork.Heze,
+  static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321,
     "review whether the new fork's data columns are reconstructable here"
   if blockFork < ConsensusFork.Fulu:
     return SlotRecon.Servable

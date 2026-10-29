@@ -936,7 +936,7 @@ proc installValidatorApiHandlers*(router: var RestRouter, node: BeaconNode) =
                                          $UnsupportedForkError)
       of ConsensusFork.Electra .. ConsensusFork.Fulu:
         addDecodedProofs(electra.SignedAggregateAndProof)
-      of ConsensusFork.Gloas .. ConsensusFork.Heze:
+      of ConsensusFork.Gloas .. ConsensusFork.Eip8321:
         addDecodedProofs(gloas.SignedAggregateAndProof)
 
     await allFutures(proofs)

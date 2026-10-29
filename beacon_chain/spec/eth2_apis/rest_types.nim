@@ -374,6 +374,7 @@ type
     of ConsensusFork.Fulu:      fuluData*:      FuluSignedBlockContents
     of ConsensusFork.Gloas:     gloasData*:     gloas.SignedBeaconBlock
     of ConsensusFork.Heze:      hezeData*:      heze.SignedBeaconBlock
+    of ConsensusFork.Eip8321:   eip8321Data*:   eip8321.SignedBeaconBlock
 
   ProduceBlockResponseV3* = ForkedMaybeBlindedBeaconBlock
 
@@ -390,12 +391,20 @@ type
     kzg_proofs*:                 fulu.KzgProofs
     blobs*:                      deneb.Blobs
 
+  Eip8321ProducedBlockContents* = object
+    `block`*:                    eip8321.BeaconBlock
+    execution_payload_envelope*: gloas.ExecutionPayloadEnvelope
+    kzg_proofs*:                 fulu.KzgProofs
+    blobs*:                      deneb.Blobs
+
   ForkedProducedBlockContents* = object
     case kind*: ConsensusFork
     of ConsensusFork.Gloas:
       gloasData*: GloasProducedBlockContents
     of ConsensusFork.Heze:
       hezeData*: HezeProducedBlockContents
+    of ConsensusFork.Eip8321:
+      eip8321Data*: Eip8321ProducedBlockContents
     else:
       discard
 
@@ -743,6 +752,11 @@ func `==`*(a, b: RestValidatorIndex): bool {.borrow.}
 template withForkyBlck*(
     x: RestPublishedSignedBlockContents, body: untyped): untyped =
   case x.kind
+  of ConsensusFork.Eip8321:
+    const consensusFork {.inject, used.} = ConsensusFork.Eip8321
+    template forkyData: untyped {.inject, used.} = x.eip8321Data
+    template forkyBlck: untyped {.inject, used.} = x.eip8321Data
+    body
   of ConsensusFork.Heze:
     const consensusFork {.inject, used.} = ConsensusFork.Heze
     template forkyData: untyped {.inject, used.} = x.hezeData
@@ -804,6 +818,10 @@ template withForkyProducedBlockContents*(
     const consensusFork {.inject, used.} = ConsensusFork.Heze
     template forkyContents: untyped {.inject, used.} = x.hezeData
     body
+  of ConsensusFork.Eip8321:
+    const consensusFork {.inject, used.} = ConsensusFork.Eip8321
+    template forkyContents: untyped {.inject, used.} = x.eip8321Data
+    body
   else:
     raiseAssert "produceBlockV4: unsupported fork " & $x.kind
 
@@ -812,6 +830,8 @@ template ProducedBlockContents*(kind: static ConsensusFork): typedesc =
     GloasProducedBlockContents
   elif kind == ConsensusFork.Heze:
     HezeProducedBlockContents
+  elif kind == ConsensusFork.Eip8321:
+    Eip8321ProducedBlockContents
   else:
     {.error: "ProducedBlockContents unsupported in " & $kind.}
 
@@ -821,6 +841,9 @@ template init*(T: type ForkedProducedBlockContents,
 template init*(T: type ForkedProducedBlockContents,
                contents: HezeProducedBlockContents): T =
   T(kind: ConsensusFork.Heze, hezeData: contents)
+template init*(T: type ForkedProducedBlockContents,
+               contents: Eip8321ProducedBlockContents): T =
+  T(kind: ConsensusFork.Eip8321, eip8321Data: contents)
 
 func init*(T: type ForkedSignedBeaconBlock,
            contents: RestPublishedSignedBlockContents): T =
@@ -844,6 +867,8 @@ func init*(T: type ForkedSignedBeaconBlock,
       ForkedSignedBeaconBlock.init(contents.gloasData)
     of ConsensusFork.Heze:
       ForkedSignedBeaconBlock.init(contents.hezeData)
+    of ConsensusFork.Eip8321:
+      ForkedSignedBeaconBlock.init(contents.eip8321Data)
 
 func init*(t: typedesc[RestPublishedSignedBlockContents],
            blck: phase0.BeaconBlock, root: Eth2Digest,
@@ -951,6 +976,18 @@ func init*(t: typedesc[RestPublishedSignedBlockContents],
   RestPublishedSignedBlockContents(
     kind: ConsensusFork.Heze,
     hezeData: heze.SignedBeaconBlock(
+      message: contents.`block`,
+      root: root,
+      signature: signature
+    )
+  )
+
+func init*(t: typedesc[RestPublishedSignedBlockContents],
+           contents: eip8321.BlockContents, root: Eth2Digest,
+           signature: ValidatorSig): RestPublishedSignedBlockContents =
+  RestPublishedSignedBlockContents(
+    kind: ConsensusFork.Eip8321,
+    eip8321Data: eip8321.SignedBeaconBlock(
       message: contents.`block`,
       root: root,
       signature: signature

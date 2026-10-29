@@ -30,6 +30,8 @@ import
   ./datatypes/[phase0, altair, bellatrix], ./helpers, ./eth2_merkleization
 
 from ./datatypes/capella import BLSToExecutionChange, SignedBLSToExecutionChange
+from ./datatypes/eip8321 import
+  RandaoCommitmentRegistration, SignedRandaoCommitmentRegistration
 
 export phase0, altair
 
@@ -452,6 +454,33 @@ proc verify_bls_to_execution_change_signature*(
   let signing_root = compute_bls_to_execution_change_signing_root(
     genesis_fork_version, genesis_validators_root, msg.message)
   blsVerify(pubkey, signing_root.data, signature)
+
+# https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/beacon-chain.md#new-process_randao_commitment_registration
+func compute_randao_commitment_registration_signing_root*(
+    genesis_fork_version: Version, genesis_validators_root: Eth2Digest,
+    msg: RandaoCommitmentRegistration): Eth2Digest =
+  # Fork-agnostic domain since registrations are valid across forks
+  let domain = compute_domain(
+    DOMAIN_RANDAO_COMMITMENT_REGISTRATION, genesis_fork_version,
+    genesis_validators_root)
+  compute_signing_root(msg, domain)
+
+proc get_randao_commitment_registration_signature*(
+    genesis_fork_version: Version, genesis_validators_root: Eth2Digest,
+    msg: RandaoCommitmentRegistration, privkey: ValidatorPrivKey):
+    CookedSig =
+  let signing_root = compute_randao_commitment_registration_signing_root(
+    genesis_fork_version, genesis_validators_root, msg)
+  blsSign(privkey, signing_root.data)
+
+proc verify_randao_commitment_registration_signature*(
+    genesis_fork_version: Version, genesis_validators_root: Eth2Digest,
+    msg: SignedRandaoCommitmentRegistration,
+    pubkey: ValidatorPubKey | CookedPubKey, signature: SomeSig): bool =
+  withTrust(signature):
+    let signing_root = compute_randao_commitment_registration_signing_root(
+      genesis_fork_version, genesis_validators_root, msg.message)
+    blsVerify(pubkey, signing_root.data, signature)
 
 # https://github.com/ethereum/consensus-specs/blob/v1.7.0-alpha.12/specs/gloas/beacon-chain.md#new-verify_execution_payload_bid_signature
 func compute_execution_payload_bid_signing_root(

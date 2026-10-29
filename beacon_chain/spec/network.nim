@@ -27,6 +27,8 @@ const
   topicPayloadAttestationMessageSuffix = "payload_attestation_message/ssz_snappy"
   topicProposerPreferencesSuffix = "proposer_preferences/ssz_snappy"
   topicInclusionListSuffix = "inclusion_list/ssz_snappy"
+  topicRandaoCommitmentRegistrationSuffix =
+    "randao_commitment_registration/ssz_snappy"
 
 const
   # The spec now includes this as a bare uint64 as `RESP_TIMEOUT`
@@ -102,6 +104,10 @@ func getAggregateAndProofsTopic*(forkDigest: ForkDigest): string =
 # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.0/specs/capella/p2p-interface.md#topics-and-messages
 func getBlsToExecutionChangeTopic*(forkDigest: ForkDigest): string =
   eth2Prefix(forkDigest) & topicBlsToExecutionChangeSuffix
+
+# https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/p2p-interface.md#randao_commitment_registration
+func getRandaoCommitmentRegistrationTopic*(forkDigest: ForkDigest): string =
+  eth2Prefix(forkDigest) & topicRandaoCommitmentRegistrationSuffix
 
 # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.0/specs/gloas/p2p-interface.md#new-execution_payload_bid
 func getExecutionPayloadBidTopic*(forkDigest: ForkDigest): string =
@@ -229,7 +235,7 @@ func getTargetGossipState*(epoch: Epoch, cfg: RuntimeConfig, isBehind: bool):
   if isBehind:
     return static(HashSet[Epoch]())
 
-  static: doAssert high(ConsensusFork) == ConsensusFork.Heze
+  static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321
   var epochs = newSeqOfCap[Epoch](
     int(high(ConsensusFork)) + 1 + len(cfg.BLOB_SCHEDULE))
   for bpo in cfg.BLOB_SCHEDULE:

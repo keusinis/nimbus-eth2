@@ -3234,6 +3234,9 @@ proc publishBlockV2*(
         of ConsensusFork.Heze:
           publishBlockV2(it, some(broadcast_validation), data.hezeData,
                          builderUrl)
+        of ConsensusFork.Eip8321:
+          publishBlockV2(it, some(broadcast_validation), data.eip8321Data,
+                         builderUrl)
       do:
         if apiResponse.isErr():
           handleCommunicationError()
@@ -3291,6 +3294,8 @@ proc publishBlockV2*(
         publishBlockV2(it, some(broadcast_validation), data.gloasData)
       of ConsensusFork.Heze:
         publishBlockV2(it, some(broadcast_validation), data.hezeData)
+      of ConsensusFork.Eip8321:
+        publishBlockV2(it, some(broadcast_validation), data.eip8321Data)
 
     do:
       if apiResponse.isErr():

@@ -20,6 +20,7 @@ from ./spec/datatypes/electra import
 from ./spec/datatypes/gloas import
   Builder, BuilderPendingPayment, BuilderPendingWithdrawal, ExecutionPayloadBid
 from ./spec/datatypes/heze import ExecutionPayloadBid
+from ./spec/datatypes/eip8321 import PendingRandaoCommitment
 
 type
   # https://github.com/ethereum/consensus-specs/blob/v1.4.0/specs/phase0/beacon-chain.md#beaconstate
@@ -715,3 +716,97 @@ type
     ptc_window*:
       HashArray[Limit ((2 + MIN_SEED_LOOKAHEAD) * SLOTS_PER_EPOCH),
         HashArray[Limit PTC_SIZE, uint64]]
+
+  # Memory-representation-equivalent to a Eip8321 BeaconState for in-place SSZ
+  # reading and writing
+  Eip8321BeaconStateNoImmutableValidators* {.sszActiveFields: [
+      1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1].} = object
+    # Versioning
+    genesis_time*: uint64
+    genesis_validators_root*: Eth2Digest
+    slot*: Slot
+    fork*: Fork
+
+    # History
+    latest_block_header*: BeaconBlockHeader
+      ## `latest_block_header.state_root == ZERO_HASH` temporarily
+
+    block_roots*: HashArray[Limit SLOTS_PER_HISTORICAL_ROOT, Eth2Digest]
+      ## Needed to process attestations, older to newer
+
+    state_roots*: HashArray[Limit SLOTS_PER_HISTORICAL_ROOT, Eth2Digest]
+    historical_roots*: HashList[Eth2Digest, Limit HISTORICAL_ROOTS_LIMIT]
+      ## Frozen in Capella, replaced by historical_summaries
+
+    # Registry
+    validators*: HashSeq[ValidatorStatusCapella]
+    balances*: HashSeq[Gwei]
+
+    # Randomness
+    randao_mixes*: HashArray[Limit EPOCHS_PER_HISTORICAL_VECTOR, Eth2Digest]
+
+    # Slashings
+    slashings*: HashArray[Limit EPOCHS_PER_SLASHINGS_VECTOR, Gwei]
+      ## Per-epoch sums of slashed effective balances
+
+    # Participation
+    previous_epoch_participation*: gloas.EpochParticipationFlags
+    current_epoch_participation*: gloas.EpochParticipationFlags
+
+    # Finality
+    justification_bits*: JustificationBits
+      ## Bit set for every recent justified epoch
+
+    previous_justified_checkpoint*: Checkpoint
+    current_justified_checkpoint*: Checkpoint
+    finalized_checkpoint*: Checkpoint
+
+    # Inactivity
+    inactivity_scores*: gloas.InactivityScores
+
+    # Light client sync committees
+    current_sync_committee*: SyncCommittee
+    next_sync_committee*: SyncCommittee
+
+    latest_block_hash*: Eth2Digest
+
+    # Withdrawals
+    next_withdrawal_index*: WithdrawalIndex
+    next_withdrawal_validator_index*: uint64
+
+    # Deep history valid from Capella onwards
+    historical_summaries*:
+      HashList[HistoricalSummary, Limit HISTORICAL_ROOTS_LIMIT]
+
+    deposit_balance_to_consume*: Gwei
+    exit_balance_to_consume*: Gwei
+    earliest_exit_epoch*: Epoch
+    consolidation_balance_to_consume*: Gwei
+    earliest_consolidation_epoch*: Epoch
+    pending_deposits*: HashSeq[PendingDeposit]
+
+    pending_partial_withdrawals*: HashSeq[PendingPartialWithdrawal]
+    pending_consolidations*: HashSeq[PendingConsolidation]
+
+    proposer_lookahead*:
+      HashArray[Limit ((MIN_SEED_LOOKAHEAD + 1) * SLOTS_PER_EPOCH), uint64]
+
+    builders*: HashSeq[Builder]
+    next_withdrawal_builder_index*: uint64
+    execution_payload_availability*: BitArray[int(SLOTS_PER_HISTORICAL_ROOT)]
+    builder_pending_payments*:
+      HashArray[Limit 2 * SLOTS_PER_EPOCH, BuilderPendingPayment]
+    builder_pending_withdrawals*: HashSeq[BuilderPendingWithdrawal]
+
+    # Execution
+    latest_execution_payload_bid*: heze.ExecutionPayloadBid
+
+    payload_expected_withdrawals*: HashSeq[Withdrawal]
+    ptc_window*:
+      HashArray[Limit ((2 + MIN_SEED_LOOKAHEAD) * SLOTS_PER_EPOCH),
+        HashArray[Limit PTC_SIZE, uint64]]
+
+    randao_commitments*: HashSeq[Eth2Digest]
+    pending_randao_commitments*: HashSeq[PendingRandaoCommitment]

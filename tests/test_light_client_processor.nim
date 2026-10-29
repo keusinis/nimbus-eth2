@@ -27,7 +27,7 @@ suite "Light client processor" & preset():
     lastPeriodWithSupermajority = 4.SyncCommitteePeriod
     highPeriod = 6.SyncCommitteePeriod
   let cfg = block:  # Fork schedule that covers each `LightClientDataFork`
-    static: doAssert ConsensusFork.high == ConsensusFork.Heze
+    static: doAssert ConsensusFork.high == ConsensusFork.Eip8321
     var res = defaultRuntimeConfig
     res.ALTAIR_FORK_EPOCH = 0.SyncCommitteePeriod.start_epoch + 1
     res.BELLATRIX_FORK_EPOCH = 0.SyncCommitteePeriod.start_epoch + 2
@@ -37,6 +37,7 @@ suite "Light client processor" & preset():
     res.FULU_FORK_EPOCH = 2.SyncCommitteePeriod.start_epoch + 1
     res.GLOAS_FORK_EPOCH = 3.SyncCommitteePeriod.start_epoch + 0
     res.HEZE_FORK_EPOCH = 3.SyncCommitteePeriod.start_epoch + 1
+    res.EIP8321_FORK_EPOCH = 4.SyncCommitteePeriod.start_epoch + 0
     res
 
   const numValidators = SLOTS_PER_EPOCH

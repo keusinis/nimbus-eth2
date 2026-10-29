@@ -1112,8 +1112,13 @@ proc installBeaconApiHandlers*(router: var RestRouter, node: BeaconNode) =
             doAssert strictVerification notin node.dag.updateFlags
             return RestApiResponse.jsonError(Http400, InvalidBlockObjectError)
 
-          static: doAssert high(ConsensusFork) == ConsensusFork.Heze
-          when consensusFork == ConsensusFork.Heze:
+          static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321
+          when consensusFork == ConsensusFork.Eip8321:
+            debugHezeComment "stub: eip8321 block routing"
+            debugHezeComment("data columns")
+            await node.router.routeSignedBeaconBlock(
+              forkyBlck, checkValidator = true)
+          elif consensusFork == ConsensusFork.Heze:
             debugHezeComment "stub: heze block routing"
             debugHezeComment("data columns")
             await node.router.routeSignedBeaconBlock(
@@ -1438,7 +1443,7 @@ proc installBeaconApiHandlers*(router: var RestRouter, node: BeaconNode) =
         return RestApiResponse.jsonError(Http400,
                                          UnsupportedForkError,
                                          $UnsupportedForkError)
-      of ConsensusFork.Electra .. ConsensusFork.Heze:
+      of ConsensusFork.Electra .. ConsensusFork.Eip8321:
         decodeAttestations(electra.SingleAttestation)
 
     let failures =
@@ -1528,7 +1533,7 @@ proc installBeaconApiHandlers*(router: var RestRouter, node: BeaconNode) =
                                   $error)
       of ConsensusFork.Electra .. ConsensusFork.Fulu:
         decodeAttesterSlashing(electra.AttesterSlashing)
-      of ConsensusFork.Gloas .. ConsensusFork.Heze:
+      of ConsensusFork.Gloas .. ConsensusFork.Eip8321:
         decodeAttesterSlashing(gloas.AttesterSlashing)
 
   # https://ethereum.github.io/beacon-APIs/#/Beacon/getPoolProposerSlashings
@@ -1600,6 +1605,48 @@ proc installBeaconApiHandlers*(router: var RestRouter, node: BeaconNode) =
                                          BlsToExecutionChangeValidationError,
                                          $res.error)
     RestApiResponse.jsonMsgResponse(BlsToExecutionChangeValidationSuccess)
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/p2p-interface.md#randao_commitment_registration
+  router.api2(MethodGet, "/eth/v1/beacon/pool/randao_commitment_registrations") do (
+    ) -> RestApiResponse:
+    RestApiResponse.jsonResponse(
+      toSeq(node.validatorChangePool.randao_commitment_registrations_gossip) &
+      toSeq(node.validatorChangePool.randao_commitment_registrations_api))
+
+  # https://github.com/lukassta/consensus-specs/blob/12c8b24bc09b12f62688d439ba20ef00b1fdfe1f/specs/_features/eip8321/p2p-interface.md#randao_commitment_registration
+  router.api2(MethodPost, "/eth/v1/beacon/pool/randao_commitment_registrations") do (
+    contentBody: Option[ContentBody]) -> RestApiResponse:
+    if node.currentSlot().epoch() < node.dag.cfg.EIP8321_FORK_EPOCH:
+      return RestApiResponse.jsonError(Http400,
+                                       InvalidRandaoCommitmentRegistrationObjectError,
+                                       "Attempt to add to RANDAO commitment registration pool pre-Eip8321")
+    let
+      registrations =
+        block:
+          if contentBody.isNone():
+            return RestApiResponse.jsonError(Http400, EmptyRequestBodyError)
+          let dres =
+            decodeBody(seq[SignedRandaoCommitmentRegistration], contentBody.get())
+          if dres.isErr():
+            return RestApiResponse.jsonError(
+              Http400, InvalidRandaoCommitmentRegistrationObjectError, $dres.error)
+          dres.get()
+      pending = mapIt(registrations,
+                      node.router.routeRandaoCommitmentRegistration(it))
+
+    await allFutures(pending)
+
+    for future in pending:
+      if future.failed() or future.cancelled():
+        return RestApiResponse.jsonError(Http400,
+                                         RandaoCommitmentRegistrationValidationError,
+                                         $future.error().msg)
+      let res = future.value()
+      if res.isErr():
+        return RestApiResponse.jsonError(Http400,
+                                         RandaoCommitmentRegistrationValidationError,
+                                         $res.error)
+    RestApiResponse.jsonMsgResponse(RandaoCommitmentRegistrationValidationSuccess)
 
   # https://ethereum.github.io/beacon-APIs/#/Beacon/submitPoolSyncCommitteeSignatures
   router.api(MethodPost, "/eth/v1/beacon/pool/sync_committees") do (
@@ -1804,7 +1851,10 @@ proc installBeaconApiHandlers*(router: var RestRouter, node: BeaconNode) =
       return RestApiResponse.jsonError(Http400, SlotFromTheIncorrectForkError)
 
     let res = withConsensusFork(consensusVersion.get()):
-      when consensusFork == ConsensusFork.Heze:
+      when consensusFork == ConsensusFork.Eip8321:
+        debugHezeComment("")
+        return RestApiResponse.jsonError(Http400, SlotFromTheIncorrectForkError)
+      elif consensusFork == ConsensusFork.Heze:
         debugHezeComment("")
         return RestApiResponse.jsonError(Http400, SlotFromTheIncorrectForkError)
       elif consensusFork == ConsensusFork.Gloas:

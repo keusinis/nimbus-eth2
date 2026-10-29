@@ -9,7 +9,8 @@
 
 import
   ./datatypes/[
-    phase0, altair, bellatrix, capella, deneb, electra, fulu, gloas, heze],
+    phase0, altair, bellatrix, capella, deneb, electra, fulu, gloas, heze,
+    eip8321],
   ./eth2_merkleization
 
 type
@@ -1660,7 +1661,8 @@ func toGloasLightClientHeader(
     # `SomeSignedBeaconBlock`: https://github.com/nim-lang/Nim/issues/18095
     blck:
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock
 ): gloas.LightClientHeader =
   template body: auto = blck.message.body
   template bid: auto = body.signed_execution_payload_bid
@@ -1684,7 +1686,8 @@ func toLightClientHeader*(
       electra.SignedBeaconBlock | electra.TrustedSignedBeaconBlock |
       fulu.SignedBeaconBlock | fulu.TrustedSignedBeaconBlock |
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock,
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock,
     kind: static LightClientDataFork): auto =
   when kind == LightClientDataFork.Gloas:
     blck.toGloasLightClientHeader()
@@ -1709,7 +1712,8 @@ func toLightClientBlockData(
       electra.SignedBeaconBlock | electra.TrustedSignedBeaconBlock |
       fulu.SignedBeaconBlock | fulu.TrustedSignedBeaconBlock |
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock,
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock,
     kind: static LightClientDataFork,
     sync_committee_signature_root: Eth2Digest,
     sync_aggregate_branch:
@@ -1756,7 +1760,8 @@ func toLightClientBlockData*(
     # `SomeSignedBeaconBlock`: https://github.com/nim-lang/Nim/issues/18095
     blck:
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock,
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock,
     kind: static LightClientDataFork): auto =
   when kind >= LightClientDataFork.Gloas:
     template body: auto = blck.message.body
@@ -1925,7 +1930,8 @@ func toGloasLightClientBlockData(
     # `SomeSignedBeaconBlock`: https://github.com/nim-lang/Nim/issues/18095
     blck:
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock,
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock,
     header: var gloas.LightClientHeader
 ): gloas.LightClientBlockData =
   template body: auto = blck.message.body
@@ -1961,7 +1967,8 @@ func toLightClientBlockData*(
       electra.SignedBeaconBlock | electra.TrustedSignedBeaconBlock |
       fulu.SignedBeaconBlock | fulu.TrustedSignedBeaconBlock |
       gloas.SignedBeaconBlock | gloas.TrustedSignedBeaconBlock |
-      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock,
+      heze.SignedBeaconBlock | heze.TrustedSignedBeaconBlock |
+      eip8321.SignedBeaconBlock | eip8321.TrustedSignedBeaconBlock,
     kind: static LightClientDataFork,
     header: var kind.LightClientHeader): auto =
   when kind == LightClientDataFork.Gloas:

@@ -4029,7 +4029,7 @@ proc doLateBlockProcessing(
 
 proc doLateBlockProcessing(
     overseer: SyncOverseerRef2,
-    gloasBlock: heze.SignedBeaconBlock,
+    gloasBlock: heze.SignedBeaconBlock | eip8321.SignedBeaconBlock,
     src: BlocksSource
 ): Future[bool] {.async: (raises: [CancelledError]).} =
   raiseAssert("TODO: Unsupported fork")

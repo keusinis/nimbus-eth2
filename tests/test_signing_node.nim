@@ -103,6 +103,9 @@ proc getBlock(
     of ConsensusFork.Heze:
       ForkedBeaconBlock.init(RestJson.decode(
         GloasBlock % [feeRecipient, SomeSignature], heze.BeaconBlock))
+    of ConsensusFork.Eip8321:
+      ForkedBeaconBlock.init(RestJson.decode(
+        GloasBlock % [feeRecipient, SomeSignature], eip8321.BeaconBlock))
   except ValueError:
     # https://github.com/nim-lang/Nim/pull/23356
     raiseAssert "Arguments match the format string"
@@ -126,6 +129,10 @@ func init(t: typedesc[Web3SignerForkedBeaconBlock],
     Web3SignerForkedBeaconBlock(
       kind: ConsensusFork.Heze,
       data: forked.hezeData.toBeaconBlockHeader)
+  of ConsensusFork.Eip8321:
+    Web3SignerForkedBeaconBlock(
+      kind: ConsensusFork.Eip8321,
+      data: forked.eip8321Data.toBeaconBlockHeader)
 
 proc createKeystore(dataDir, pubkey,
                     store, password: string): Result[void, string] =
@@ -1192,6 +1199,83 @@ block:
     asyncTest "Signing BeaconBlock (getBlockSignature(heze))":
       let
         fork = ConsensusFork.Heze
+        forked1 = getBlock(fork)
+        blockRoot1 = withBlck(forked1): hash_tree_root(forkyBlck)
+        forked2 = getBlock(fork, SigningOtherFeeRecipient)
+        blockRoot2 = withBlck(forked2): hash_tree_root(forkyBlck)
+        request1 = Web3SignerRequest.init(SigningFork, GenesisValidatorsRoot,
+          Web3SignerForkedBeaconBlock.init(forked1))
+        request2 = Web3SignerRequest.init(SigningFork, GenesisValidatorsRoot,
+          Web3SignerForkedBeaconBlock.init(forked1), @[])
+        remoteUrl = "http://" & SigningNodeAddress & ":" &
+                    $getNodePort(basePort, RemoteSignerType.VerifyingWeb3Signer)
+        prestoFlags = {RestClientFlag.CommaSeparatedArray}
+        rclient = RestClientRef.new(remoteUrl, prestoFlags, {})
+        publicKey1 = ValidatorPubKey.fromHex(ValidatorPubKey1).get()
+        publicKey2 = ValidatorPubKey.fromHex(ValidatorPubKey2).get()
+        publicKey3 = ValidatorPubKey.fromHex(ValidatorPubKey3).get()
+
+      check rclient.isOk()
+
+      let
+        client = rclient.get()
+        sres1 =
+          await validator1.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        sres2 =
+          await validator2.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        sres3 =
+          await validator3.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        rres1 =
+          await validator4.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        rres2 =
+          await validator5.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        rres3 =
+          await validator6.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot1, forked1)
+        bres1 =
+          await validator4.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot2, forked2)
+        bres2 =
+          await validator5.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot2, forked2)
+        bres3 =
+          await validator6.getBlockSignature(SigningFork, GenesisValidatorsRoot,
+            blockRoot2, forked2)
+
+      check:
+        sres1.get() == rres1.get()
+        sres2.get() == rres2.get()
+        sres3.get() == rres3.get()
+        bres1.isErr()
+        bres2.isErr()
+        bres3.isErr()
+
+      try:
+        let
+          response1 = await client.signDataPlain(publicKey1, request1)
+          response2 = await client.signDataPlain(publicKey2, request1)
+          response3 = await client.signDataPlain(publicKey3, request1)
+          response4 = await client.signDataPlain(publicKey1, request2)
+          response5 = await client.signDataPlain(publicKey2, request2)
+          response6 = await client.signDataPlain(publicKey3, request2)
+        check:
+          response1.status == 400
+          response2.status == 400
+          response3.status == 400
+          response4.status == 400
+          response5.status == 400
+          response6.status == 400
+      finally:
+        await client.closeWait()
+
+    asyncTest "Signing BeaconBlock (getBlockSignature(eip8321))":
+      let
+        fork = ConsensusFork.Eip8321
         forked1 = getBlock(fork)
         blockRoot1 = withBlck(forked1): hash_tree_root(forkyBlck)
         forked2 = getBlock(fork, SigningOtherFeeRecipient)

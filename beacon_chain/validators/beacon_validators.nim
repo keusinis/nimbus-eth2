@@ -149,6 +149,7 @@ proc addValidators*(node: BeaconNode) {.async: (raises: [CancelledError]).} =
 
       v = node.attachedValidators[].addValidator(keystore, feeRecipient,
                                                  gasLimit)
+    v.loadHashChain(node.config.validatorsDir())
     node.attachedValidators[].updateValidator(v, data)
 
   # We use `allFutures` because all failures are already reported as
@@ -421,10 +422,25 @@ proc proposeBlockAux(
     state = node.dag.getProposalState(head, slot, cache[]).valueOr:
       beacon_block_production_errors.inc()
       return head
+    randao_reveal = randao_reveal
+    hash_chain_reveal = default(Eth2Digest)
 
   let
     graffiti = node.getGraffitiBytes(validator)
     validator_index = validator.index.expect("index set for proposer")
+
+  when fork >= ConsensusFork.Eip8321:
+    let commitment =
+      state[].forky(fork).data.randao_commitments.item(validator_index)
+    if not commitment.isZero:
+      hash_chain_reveal = validator.hashChain.getHashChainReveal(
+          commitment).valueOr:
+        warn "No hash chain reveal available for RANDAO commitment",
+          validator = shortLog(validator), slot, commitment
+        return head
+      randao_reveal = ValidatorSig.infinity()
+
+  let
 
     parentExecutionRequests = block:
       when fork >= ConsensusFork.Gloas:
@@ -485,7 +501,7 @@ proc proposeBlockAux(
 
   let
     engineBid =
-      when fork == ConsensusFork.Heze:
+      when fork in [ConsensusFork.Heze, ConsensusFork.Eip8321]:
         debugHezeComment "stub: heze block proposals"
         await node.getExecutionPayload(
           fork, head, state, validator_index, validator.pubkey,
@@ -535,6 +551,7 @@ proc proposeBlockAux(
             head,
             slot,
             bids.builderBid.value(),
+            hash_chain_reveal = hash_chain_reveal,
           )
 
           if builderBlockRes.isOk:
@@ -673,6 +690,7 @@ proc proposeBlockAux(
         selectedBuilderBid
       else:
         Opt.none(gloas.SignedExecutionPayloadBid),
+      hash_chain_reveal = hash_chain_reveal,
     ).valueOr:
       beacon_block_production_errors.inc()
       return head
@@ -689,7 +707,7 @@ proc proposeBlockAux(
       message: engineBlock.blck, signature: signature, root: blockRoot
     )
 
-  when fork == ConsensusFork.Heze:
+  when fork in [ConsensusFork.Heze, ConsensusFork.Eip8321]:
     debugHezeComment "stub: heze sidecar assembly"
     let sidecarsOpt = Opt.none(gloas.DataColumnSidecars)
   elif fork == ConsensusFork.Gloas:

@@ -147,7 +147,8 @@ proc publishRouteBlock(
 
 proc publishSidecars(
     router: ref MessageRouter,
-    _: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    _: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+       eip8321.SignedBeaconBlock,
     sidecarsOpt: Opt[gloas.DataColumnSidecars]
 ): Future[Opt[gloas.DataColumnSidecars]] {.async: (raises: [CancelledError]).} =
   let cols = sidecarsOpt.get()
@@ -260,7 +261,8 @@ proc routeSignedBeaconBlock*(
 
 proc routeSignedBeaconBlock*(
     router: ref MessageRouter,
-    blck: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    blck: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+          eip8321.SignedBeaconBlock,
     checkValidator: bool
 ): Future[RouteBlockResult] {.async: (raises: [CancelledError]).} =
   ## Same as pre-Gloas block but no sidecars publishing.
@@ -679,6 +681,41 @@ proc routeBlsToExecutionChange*(
 
   ok()
 
+proc routeRandaoCommitmentRegistration*(
+    router: ref MessageRouter,
+    registration: SignedRandaoCommitmentRegistration):
+    Future[SendResult] {.async: (raises: [CancelledError]).} =
+  block:
+    let res = await router.processor.processRandaoCommitmentRegistration(
+      MsgSource.api, registration)
+    if not res.isGoodForSending:
+      warn "RANDAO commitment registration request failed validation",
+            validator_index = registration.message.validator_index,
+            commitment = shortLog(registration.message.commitment),
+            error = res.error()
+      return err(res.error()[1])
+
+  let wallEpoch =
+    router[].getCurrentBeaconTime().slotOrZero(router[].dag.timeParams).epoch
+  if wallEpoch < router[].dag.cfg.EIP8321_FORK_EPOCH:
+    # Broadcast hasn't failed, it just hasn't happened; desire seems to be to
+    # allow queuing up RANDAO commitment registrations.
+    return ok()
+
+  let res = await router[].network.broadcastRandaoCommitmentRegistration(
+    registration)
+  if res.isOk():
+    notice "RANDAO commitment registration sent",
+      validator_index = registration.message.validator_index,
+      commitment = shortLog(registration.message.commitment)
+  else: # "no broadcast" is not a fatal error
+    notice "RANDAO commitment registration not sent",
+      validator_index = registration.message.validator_index,
+      commitment = shortLog(registration.message.commitment),
+      error = res.error()
+
+  ok()
+
 proc routePayloadAttestationMessage*(
     router: ref MessageRouter,
     message: PayloadAttestationMessage,
@@ -753,7 +790,8 @@ proc validateAndPublishEnvelope*(
 
 proc routeExecutionPayloadEnvelope*(
     router: ref MessageRouter,
-    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+                 eip8321.SignedBeaconBlock,
     signedEnvelope: gloas.SignedExecutionPayloadEnvelope,
     sidecarsOpt: Opt[gloas.DataColumnSidecars],
 ): Future[Result[void, cstring]] {.async: (raises: [CancelledError]).} =

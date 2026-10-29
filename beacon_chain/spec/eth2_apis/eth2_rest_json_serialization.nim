@@ -125,6 +125,7 @@ RestJson.useDefaultSerializationFor(
   GetValidatorGasLimitResponse,
   GloasProducedBlockContents,
   HezeProducedBlockContents,
+  Eip8321ProducedBlockContents,
   HeadChangeInfoObject,
   HeadV2ChangeInfoObject,
   HeadV2ChangeInfoObjectData,
@@ -347,6 +348,13 @@ RestJson.useDefaultSerializationFor(
   heze.BlockContents,
   heze.ExecutionPayloadBid,
   heze.SignedExecutionPayloadBid,
+  eip8321.BeaconBlock,
+  eip8321.BeaconBlockBody,
+  eip8321.BeaconState,
+  eip8321.BlockContents,
+  eip8321.RandaoCommitmentRegistration,
+  eip8321.SignedRandaoCommitmentRegistration,
+  eip8321.PendingRandaoCommitment,
   phase0.AggregateAndProof,
   phase0.Attestation,
   phase0.AttesterSlashing,
@@ -721,6 +729,8 @@ proc readValue*(r: var RestJsonReader, value: var ForkedHashedBeaconState) {.rea
       toValue(gloasData)
     of ConsensusFork.Heze:
       toValue(hezeData)
+    of ConsensusFork.Eip8321:
+      toValue(eip8321Data)
   except SerializationError:
     r.raiseUnexpectedValue(&"Incorrect {v.version} beacon state format")
 

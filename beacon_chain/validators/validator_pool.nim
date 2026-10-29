@@ -86,6 +86,8 @@ type
 
     lastWarning*: Opt[Slot]
 
+    hashChain*: seq[Eth2Digest]
+
   SignResponse* = Web3SignerDataResponse
 
   SignatureResult* = Result[ValidatorSig, string]
@@ -546,6 +548,8 @@ proc forkIndex(
     prop.gloasIndex
   elif fork == ConsensusFork.Heze:
     debugHezeComment "add hezeIndex to ProvenProperty"
+    prop.gloasIndex
+  elif fork == ConsensusFork.Eip8321:
     prop.gloasIndex
   else:
     static: raiseAssert "Unknown fork " & $fork

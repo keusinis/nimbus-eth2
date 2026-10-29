@@ -323,7 +323,7 @@ proc getForkedBlock*(db: BeaconChainDB, root: Eth2Digest):
     Opt[ForkedTrustedSignedBeaconBlock] =
   # When we only have a digest, we don't know which fork it's from so we try
   # them one by one - this should be used sparingly
-  static: doAssert high(ConsensusFork) == ConsensusFork.Heze
+  static: doAssert high(ConsensusFork) == ConsensusFork.Eip8321
   debugHezeComment "use Heze getBlock"
   if   (let blck = db.getBlock(root, gloas.TrustedSignedBeaconBlock);
       blck.isSome()):
@@ -1474,6 +1474,7 @@ proc init*(
       of ConsensusFork.Fulu:      fuluFork(cfg)
       of ConsensusFork.Gloas:     gloasFork(cfg)
       of ConsensusFork.Heze:      hezeFork(cfg)
+      of ConsensusFork.Eip8321:   eip8321Fork(cfg)
     stateFork = dag.headState.fork
 
   # Here, we check only the `current_version` field because the spec
