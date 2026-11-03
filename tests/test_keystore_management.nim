@@ -924,3 +924,54 @@ suite "saveKeystore()":
 
       namesEqual(validatorPubKeys,
                  [MultipleKeystoreNames[0], MultipleKeystoreNames[1]])
+
+suite "Hash chain secret":
+  test "Encrypted round trip, wrong password, legacy plaintext migration":
+    let
+      dir = testDataDir / "hash_chain"
+      hdir = dir / "hash_chains"
+      sdir = dir / "secrets"
+      vdir = dir / "validators"
+      pubkey = ValidatorPrivKey.fromRaw(
+        hexToSeqByte(MultiplePrivateKeys[0])).get().toPubKey().toPubKey()
+      secret = generateHashChainSecret(rng[])
+      secretHex = byteutils.toHex(secret.data)
+      path = hashChainSecretPath(hdir, pubkey)
+      pwdPath = hashChainPasswordPath(sdir, pubkey)
+      legacyDir = vdir / ("0x" & pubkey.toHex())
+      legacyPath = legacyDir / "hash_chain_secret"
+    defer:
+      try: os.removeDir(dir)
+      except OSError: discard
+
+    check:
+      loadHashChainSecret(rng[], hdir, sdir, vdir, pubkey).get().isNone
+      saveHashChainSecret(rng[], hdir, sdir, pubkey, secret).isOk
+      fileExists(pwdPath)
+      secretHex notin readAllChars(path).get()
+      loadHashChainSecret(rng[], hdir, sdir, vdir, pubkey).get() ==
+        Opt.some(secret)
+
+      secureWriteFile(pwdPath, "wrong").isOk
+      loadHashChainSecret(rng[], hdir, sdir, vdir, pubkey).isErr
+
+      io2.removeFile(path).isOk
+      io2.removeFile(pwdPath).isOk
+      secureCreatePath(legacyDir).isOk
+      secureWriteFile(legacyPath, secretHex).isOk
+      loadHashChainSecret(rng[], hdir, sdir, vdir, pubkey).get() ==
+        Opt.some(secret)
+      not fileExists(legacyPath)
+      fileExists(path)
+      fileExists(pwdPath)
+      loadHashChainSecret(rng[], hdir, sdir, vdir, pubkey).get() ==
+        Opt.some(secret)
+
+  test "Reveal walks the chain from the secret":
+    let
+      secret = generateHashChainSecret(rng[])
+      chain = compute_hash_chain(secret, 8).get()
+    check:
+      getHashChainReveal(secret, chain[^1]) == Opt.some(chain[^2])
+      getHashChainReveal(secret, chain[1]) == Opt.some(chain[0])
+      getHashChainReveal(secret, secret).isNone
