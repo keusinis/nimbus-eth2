@@ -50,13 +50,18 @@ BN_URL=$(kurtosis port print "$ENCLAVE" "$BN_SERVICE" http)
 head_epoch() {
   local slot
   slot=$(curl -sf "$BN_URL/eth/v1/beacon/headers/head" |
-    jq -r '.data.header.message.slot') || slot=0
+    jq -r '.data.header.message.slot') || return 1
   echo $(( slot / SLOTS_PER_EPOCH ))
 }
 
 wait_for_epoch() {
   echo "Waiting for epoch $1"
-  until (( $(head_epoch) >= $1 )); do sleep 12; done
+  local epoch
+  while :; do
+    epoch=$(head_epoch) || { echo "Beacon node $BN_URL unreachable" >&2; exit 1; }
+    (( epoch >= $1 )) && break
+    sleep 12
+  done
 }
 
 wait_for_epoch "$EIP8321_FORK_EPOCH"
