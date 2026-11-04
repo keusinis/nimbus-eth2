@@ -953,10 +953,13 @@ suite "Hash chain secret":
       loadHashChainSecret(hdir, sdir, pubkey).isErr
 
   test "Reveal walks the chain from the secret":
-    let
-      secret = generateHashChainSecret(rng[])
-      chain = compute_hash_chain(secret, 8).get()
+    let secret = generateHashChainSecret(rng[])
+    var links = @[secret]
+    for _ in 0 ..< 8:
+      links.add compute_hash_chain_link(links[^1])
     check:
-      getHashChainReveal(secret, chain[^1]) == Opt.some(chain[^2])
-      getHashChainReveal(secret, chain[1]) == Opt.some(chain[0])
+      compute_hash_chain_commitment(secret, 8) == Opt.some(links[^1])
+      compute_hash_chain_commitment(default(Eth2Digest), 8).isNone
+      getHashChainReveal(secret, links[^1]) == Opt.some(links[^2])
+      getHashChainReveal(secret, links[1]) == Opt.some(links[0])
       getHashChainReveal(secret, secret).isNone

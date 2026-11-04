@@ -22,16 +22,16 @@ const
   HashChainSecretFileName* = "hash_chain_secret"
   HashChainLength* = 1 shl 16
 
-func compute_hash_chain*(
-    secret: Eth2Digest, length: int): Opt[seq[Eth2Digest]] =
-  var chain = newSeqOfCap[Eth2Digest](length + 1)
-  chain.add secret
-  for i in 1 .. length:
-    chain.add compute_hash_chain_link(chain[^1])
-  for link in chain:
+func compute_hash_chain_commitment*(
+    secret: Eth2Digest, length: int): Opt[Eth2Digest] =
+  var link = secret
+  if link.isZero:
+    return Opt.none(Eth2Digest)
+  for _ in 0 ..< length:
+    link = compute_hash_chain_link(link)
     if link.isZero:
-      return Opt.none(seq[Eth2Digest])
-  Opt.some(chain)
+      return Opt.none(Eth2Digest)
+  Opt.some(link)
 
 proc generateHashChainSecret*(rng: var HmacDrbgContext): Eth2Digest =
   Eth2Digest(data: rng.generate(array[32, byte]))
