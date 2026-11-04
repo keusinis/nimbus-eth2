@@ -1045,23 +1045,26 @@ proc loadHashChainSecrets*(node: BeaconNode) =
         warn "Unable to load hash chain secret", pubkey, reason = error
         continue
       if secret.isSome:
-        node.hashChainSecrets[pubkey] = secret.get
+        node.hashChains[pubkey] = HashChain.init(secret.get)
   except OSError as exc:
     warn "Unable to list hash chain secrets", hashChainsDir, reason = exc.msg
-  info "Loaded hash chain secrets", count = node.hashChainSecrets.len
+  info "Loaded hash chain secrets", count = node.hashChains.len
 
 proc getHashChainReveal*(
     node: BeaconNode, pubkey: ValidatorPubKey,
     commitment: Eth2Digest): Opt[Eth2Digest] =
-  if pubkey notin node.hashChainSecrets:
+  if pubkey notin node.hashChains:
     let secret = loadHashChainSecret(
         node.config.hashChainsDir(), node.config.secretsDir(), pubkey).valueOr:
       warn "Unable to load hash chain secret", pubkey, reason = error
       return Opt.none(Eth2Digest)
     if secret.isNone:
       return Opt.none(Eth2Digest)
-    node.hashChainSecrets[pubkey] = secret.get
-  node.hashChainSecrets.getOrDefault(pubkey).getHashChainReveal(commitment)
+    node.hashChains[pubkey] = HashChain.init(secret.get)
+  try:
+    node.hashChains[pubkey].getHashChainReveal(commitment)
+  except KeyError:
+    raiseAssert "just checked"
 
 proc makeBlockAndMaybeEnvelopeForHeadAndSlot*(
     node: BeaconNode,
