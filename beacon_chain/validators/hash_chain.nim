@@ -21,6 +21,13 @@ export blake3
 const
   HashChainSecretFileName* = "hash_chain_secret"
   HashChainLength* = 1 shl 16
+  HashChainCheckpointInterval = 256
+
+type
+  HashChain* = object
+    secret: Eth2Digest
+    checkpoints: seq[Eth2Digest]
+    hint: int
 
 func compute_hash_chain_commitment*(
     secret: Eth2Digest, length: int): Opt[Eth2Digest] =
@@ -32,6 +39,9 @@ func compute_hash_chain_commitment*(
     if link.isZero:
       return Opt.none(Eth2Digest)
   Opt.some(link)
+
+func init*(T: type HashChain, secret: Eth2Digest): T =
+  T(secret: secret, hint: HashChainLength)
 
 proc generateHashChainSecret*(rng: var HmacDrbgContext): Eth2Digest =
   Eth2Digest(data: rng.generate(array[32, byte]))
@@ -91,11 +101,29 @@ proc loadHashChainSecret*(
   ok Opt.some(secret)
 
 func getHashChainReveal*(
-    secret, commitment: Eth2Digest): Opt[Eth2Digest] =
-  var link = secret
-  for _ in 0 ..< HashChainLength:
-    let next = compute_hash_chain_link(link)
-    if next == commitment:
-      return Opt.some(link)
-    link = next
+    chain: var HashChain, commitment: Eth2Digest): Opt[Eth2Digest] =
+  if chain.checkpoints.len == 0:
+    var link = chain.secret
+    for i in 0 ..< HashChainLength:
+      if i mod HashChainCheckpointInterval == 0:
+        chain.checkpoints.add link
+      link = compute_hash_chain_link(link)
+
+  template searchSegment(segment: int) =
+    var link = chain.checkpoints[segment]
+    for step in 0 ..< HashChainCheckpointInterval:
+      let index = segment * HashChainCheckpointInterval + step
+      if index >= HashChainLength:
+        break
+      let next = compute_hash_chain_link(link)
+      if next == commitment:
+        chain.hint = index + 1
+        return Opt.some(link)
+      link = next
+
+  let hintSegment = (chain.hint - 1) div HashChainCheckpointInterval
+  for segment in countdown(hintSegment, 0):
+    searchSegment(segment)
+  for segment in hintSegment + 1 ..< chain.checkpoints.len:
+    searchSegment(segment)
   Opt.none(Eth2Digest)
