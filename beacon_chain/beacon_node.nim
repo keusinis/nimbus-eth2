@@ -36,6 +36,8 @@ import
     keystore_management],
   ./rpc/state_ttl_cache
 
+from ./validators/hash_chain import HashChain
+
 export
   osproc, chronos, presto, action_tracker,
   beacon_clock, beacon_chain_db, conf, light_client,
@@ -133,7 +135,7 @@ type
     lastColumnCustodyIndices*: seq[CustodyIndex]
     sentProposerPreferences*: array[2, HashSet[(uint64, Slot)]]
     producedPayloadContents*: Opt[gloas.SignedExecutionPayloadEnvelopeContents]
-    hashChainSecrets*: Table[ValidatorPubKey, Eth2Digest]
+    hashChains*: Table[ValidatorPubKey, HashChain]
     shutdownEvent*: AsyncEvent
 
 proc currentSlot*(node: BeaconNode): Slot =

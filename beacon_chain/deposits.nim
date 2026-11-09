@@ -460,14 +460,15 @@ proc restRegisterRandaoCommitment(
       validatorDesc = $validatorIdx & "(" & validatorKeyAsStr[0..9] & ")"
       signingKey = getSigningKey(config, validator, validatorKeyAsStr)
 
-    var chain: seq[Eth2Digest]
+    var commitment: Eth2Digest
     let existing = loadHashChainSecret(
         config.hashChainsDir, config.secretsDir, validatorKey).valueOr:
       fatal "Failed to load hash chain secret",
             validator = validatorDesc, reason = error
       quit 1
     if existing.isSome:
-      chain = compute_hash_chain(existing.get, HashChainLength).valueOr:
+      commitment = compute_hash_chain_commitment(
+          existing.get, HashChainLength).valueOr:
         fatal "Stored hash chain secret produces a zero link",
               validator = validatorDesc
         quit 1
@@ -475,9 +476,9 @@ proc restRegisterRandaoCommitment(
       var secret: Eth2Digest
       while true:
         secret = generateHashChainSecret(rng)
-        let res = compute_hash_chain(secret, HashChainLength)
+        let res = compute_hash_chain_commitment(secret, HashChainLength)
         if res.isSome:
-          chain = res.get
+          commitment = res.get
           break
       saveHashChainSecret(
           rng, config.hashChainsDir, config.secretsDir, validatorKey,
@@ -488,7 +489,7 @@ proc restRegisterRandaoCommitment(
 
     let
       message = RandaoCommitmentRegistration(
-        validator_index: validatorIdx, commitment: chain[^1])
+        validator_index: validatorIdx, commitment: commitment)
       signedRegistration = SignedRandaoCommitmentRegistration(
         message: message,
         signature: get_randao_commitment_registration_signature(

@@ -952,11 +952,19 @@ suite "Hash chain secret":
       secureWriteFile(pwdPath, "wrong").isOk
       loadHashChainSecret(hdir, sdir, pubkey).isErr
 
-  test "Reveal walks the chain from the secret":
-    let
-      secret = generateHashChainSecret(rng[])
-      chain = compute_hash_chain(secret, 8).get()
+  test "Commitment and reveals from checkpoints":
+    let secret = generateHashChainSecret(rng[])
+    var links = @[secret]
+    for _ in 0 ..< HashChainLength:
+      links.add compute_hash_chain_link(links[^1])
+    var chain = HashChain.init(secret)
     check:
-      getHashChainReveal(secret, chain[^1]) == Opt.some(chain[^2])
-      getHashChainReveal(secret, chain[1]) == Opt.some(chain[0])
-      getHashChainReveal(secret, secret).isNone
+      compute_hash_chain_commitment(secret, HashChainLength) ==
+        Opt.some(links[^1])
+      compute_hash_chain_commitment(default(Eth2Digest), 8).isNone
+      chain.getHashChainReveal(links[^1]) == Opt.some(links[^2])
+      chain.getHashChainReveal(links[^2]) == Opt.some(links[^3])
+      chain.getHashChainReveal(links[1000]) == Opt.some(links[999])
+      chain.getHashChainReveal(links[1]) == Opt.some(links[0])
+      chain.getHashChainReveal(links[^1]) == Opt.some(links[^2])
+      chain.getHashChainReveal(secret).isNone
