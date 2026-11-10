@@ -72,7 +72,8 @@ type
 const SKIP = [
   # Vector primes the `seen` set out of band; not reproducible from its files
   "gossip_randao_commitment_registration__ignore_already_seen",
-  # Heze genesis state with Eip8321 scheduled later; test DAG is genesis-forked
+  # EIP8321 state with Heze fork version; pyspec orders fork versions bytewise,
+  # Nimbus gates on state fork kind, as EIP-8321 defines no version check
   "gossip_randao_commitment_registration__ignore_pre_eip8321_head_state",
   # Synthetic state fork version 0xffffffff; test DAG rejects it as wrong network
   "gossip_randao_commitment_registration__valid_post_eip8321_head_state",
