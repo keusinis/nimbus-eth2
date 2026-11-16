@@ -577,7 +577,7 @@ func increaseBlocksCount*[A](
   let
     maxCount =
       withConsensusFork(fork):
-        when consensusFork <= ConsensusFork.Gloas:
+        when consensusFork >= ConsensusFork.Fulu:
           int(MAX_REQUEST_BLOCKS_DENEB)
         else:
           raiseAssert "Unsupported fork!"
@@ -600,7 +600,7 @@ func increaseSidecarsCount*[A](
       withConsensusFork(fork):
         when consensusFork <= ConsensusFork.Electra:
           0
-        elif consensusFork <= ConsensusFork.Gloas:
+        elif consensusFork >= ConsensusFork.Fulu:
           int(cfg.MAX_REQUEST_DATA_COLUMN_SIDECARS)
         else:
           raiseAssert "Unsupported fork!"
@@ -621,7 +621,7 @@ func increaseEnvelopesCount*[A](
       withConsensusFork(fork):
         when consensusFork <= ConsensusFork.Fulu:
           0
-        elif consensusFork == ConsensusFork.Gloas:
+        elif consensusFork >= ConsensusFork.Gloas:
           int(MAX_REQUEST_PAYLOADS)
         else:
           raiseAssert "Unsupported fork!"
