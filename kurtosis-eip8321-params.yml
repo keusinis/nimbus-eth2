@@ -12,10 +12,11 @@ participants_matrix:
     - el_type: ethrex
       el_image: ethpandaops/ethrex:heze-devnet-2
   cl:
+    - cl_type: grandine
+      cl_image: ${GRANDINE_IMAGE}
     - cl_type: nimbus
       cl_image: ${NIMBUS_IMAGE}
-    # - cl_type: grandine
-    #   cl_image: ghcr.io/<owner>/grandine:eip8321
+      cl_log_level: debug
     # - cl_type: lighthouse
     #   cl_image: ghcr.io/<owner>/lighthouse:eip8321
     # - cl_type: teku
@@ -24,8 +25,11 @@ participants_matrix:
     #   cl_image: ghcr.io/<owner>/lodestar:eip8321
     # - cl_type: prysm
     #   cl_image: ghcr.io/<owner>/prysm:eip8321
-  count: 2
+  count: 1
 network_params:
+  preset: minimal
+  slot_duration_ms: 12000
+  slot_duration_ms_heze: 12000
   fulu_fork_epoch: 0
   gloas_fork_epoch: 1
   heze_fork_epoch: 2
@@ -33,7 +37,7 @@ ethereum_genesis_generator_params:
   image: eip8321-genesis-generator
   extra_env:
     EIP8321_FORK_EPOCH: "${EIP8321_FORK_EPOCH}"
-    EIP8321_FORK_VERSION: "0xe8321000"
+    EIP8321_FORK_VERSION: "0xe8321001"
 additional_services:
   - assertoor
   - dora
