@@ -40,7 +40,9 @@ if [[ "$BUILD" == 1 ]]; then
   docker build -t eip8321-genesis-generator docker/eip8321-genesis-generator
 fi
 
-kurtosis run --enclave "$ENCLAVE" github.com/ethpandaops/ethereum-package \
+# Pinned: later ethereum-package revisions need a newer Kurtosis than 1.22
+ETHEREUM_PACKAGE_REF="${ETHEREUM_PACKAGE_REF:-5795b77e65235ad223d4d3b413b2739190bf60cc}"
+kurtosis run --enclave "$ENCLAVE" "github.com/ethpandaops/ethereum-package@$ETHEREUM_PACKAGE_REF" \
   --args-file <(envsubst < kurtosis-eip8321-params.yml)
 
 NIMBUS_SERVICES=$(kurtosis enclave inspect "$ENCLAVE" |
