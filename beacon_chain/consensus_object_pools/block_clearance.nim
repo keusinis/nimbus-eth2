@@ -10,6 +10,7 @@
 import
   chronicles,
   results,
+  stew/assign2,
   ../spec/[
     beaconstate, forks, signatures, signatures_batch,
     state_transition, state_transition_epoch],
@@ -494,7 +495,7 @@ proc addBackfillBlock*(
 
 proc addHeadExecutionPayload*(
     dag: ChainDAGRef,
-    signedBlock: gloas.SignedBeaconBlock,
+    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
     signedEnvelope: gloas.SignedExecutionPayloadEnvelope,
     optimisticStatus: OptimisticStatus,
 ): Result[BlockRef, PayloadVerifierError] =

@@ -50,6 +50,8 @@ from std/sequtils import mapIt
 from std/tables import `[]=`, contains, getOrDefault, len
 from std/times import Time, getTime
 from stew/byteutils import fromBytes
+from ../consensus_object_pools/inclusion_list_pool import
+  getPayloadInclusionListTransactions
 from ../spec/beaconstate import
   get_block_root_at_slot, get_expected_withdrawals, latest_block_id,
   proposalExecutionHead
@@ -137,11 +139,11 @@ func toBidCandidate(
     max_execution_payment: Gwei,
     min_bid: Gwei,
     builder_boost_factor: uint64,
-    url: Opt[List[byte, Limit MAX_BUILDER_URL_SIZE]]): Opt[BidCandidate] =
+    url: Opt[BuilderUrlString]): Opt[BidCandidate] =
   toBidCandidate(
     bid, max_execution_payment, min_bid, builder_boost_factor,
     if url.isSome():
-      Opt.some(string.fromBytes(url.get().asSeq()))
+      Opt.some($url.get())
     else:
       Opt.none(string)
   )
@@ -453,7 +455,18 @@ proc getExecutionPayload*(
   let
     state = ForkchoiceStateV1.init(executionHead, latestSafe, latestFinalized)
     attributes =
-      when consensusFork >= ConsensusFork.Gloas:
+      when consensusFork >= ConsensusFork.Heze:
+        # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.4/specs/heze/validator.md#executionpayload
+        PayloadAttributesV5.init(
+          timestamp, prevRandao, feeRecipient, withdrawals,
+          beaconHead.blck.bid.root, slot,
+          node.consensusManager[].getGasLimit(validator_pubkey),
+          node.consensusManager.inclusionListPool[]
+            .getPayloadInclusionListTransactions(
+              node.dag, beaconHead.blck.bid, slot - 1, only_timely = false)
+            .get(@[]),
+        )
+      elif consensusFork >= ConsensusFork.Gloas:
         PayloadAttributesV4.init(
           timestamp, prevRandao, feeRecipient, withdrawals,
           beaconHead.blck.bid.root, slot,

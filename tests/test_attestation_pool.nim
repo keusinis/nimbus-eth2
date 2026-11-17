@@ -102,8 +102,9 @@ suite "Attestation pool electra processing" & preset():
         cfg.makeTestDB(
           TOTAL_COMMITTEES * TARGET_COMMITTEE_SIZE * SLOTS_PER_EPOCH),
         validatorMonitor, {})
+    var
       taskpool = Taskpool.new()
-    var verifier {.used.} = BatchVerifier.init(rng, taskpool)
+      verifier {.used.} = BatchVerifier.init(rng, taskpool)
     let
       quarantine = newClone(Quarantine.init(dag.cfg))
       pool = newClone(AttestationPool.init(dag, quarantine))
@@ -139,6 +140,9 @@ suite "Attestation pool electra processing" & preset():
         blck: electra.SignedBeaconBlock): Result[BlockRef, VerifierError] =
       addHeadBlockToForkChoice(
         blck, blck.message.slot.start_beacon_time(cfg.timeParams))
+
+  teardown:
+    taskpool.shutdown()
 
   test "Attestation from different branch" & preset():
     # Create two alternate histories with different shufflings
@@ -1154,8 +1158,9 @@ suite "Attestation pool gloas processing" & preset():
         cfg.makeTestDB(
           TOTAL_COMMITTEES * TARGET_COMMITTEE_SIZE * SLOTS_PER_EPOCH),
         validatorMonitor, {})
+    var
       taskpool = Taskpool.new()
-    var verifier {.used.} = BatchVerifier.init(rng, taskpool)
+      verifier {.used.} = BatchVerifier.init(rng, taskpool)
     let
       quarantine = newClone(Quarantine.init(dag.cfg))
       pool = newClone(AttestationPool.init(dag, quarantine))
@@ -1185,6 +1190,9 @@ suite "Attestation pool gloas processing" & preset():
         pool[].addForkChoice(
           epochRef, blckRef, unrealized, signedBlock.message,
           blck.message.slot.start_beacon_time(cfg.timeParams))
+
+  teardown:
+    taskpool.shutdown()
 
   test "EL-invalid payload only invalidates the FULL variant":
     var cache = StateCache()
@@ -1252,6 +1260,22 @@ suite "Attestation pool gloas processing" & preset():
         head != b3Add[]
         head == b1Add[]
 
+  test "Stored payload envelopes are replayed into fork choice on restart":
+    var cache = StateCache()
+    let
+      b1 = addTestBlock(state[], cache, cfg = cfg).gloasData
+      b1Add = addHeadBlockToForkChoice(b1)
+    check b1Add.isOk
+
+    dag.db.putExecutionPayloadEnvelope(
+      gloas.SignedExecutionPayloadEnvelope(
+        message: gloas.ExecutionPayloadEnvelope(beacon_block_root: b1.root)))
+
+    # A fresh pool rebuilds fork choice from the dag, like a restart does
+    let restarted = newClone(AttestationPool.init(dag, quarantine))
+    check:
+      b1.root in restarted[].forkChoice.backend.proto_array.fullBlockIndices
+
   test "Inclusion list satisfaction is not recorded before Heze":
     var cache = StateCache()
     let
@@ -1311,8 +1335,9 @@ suite "Attestation pool heze processing" & preset():
         cfg.makeTestDB(
           TOTAL_COMMITTEES * TARGET_COMMITTEE_SIZE * SLOTS_PER_EPOCH),
         validatorMonitor, {})
+    var
       taskpool = Taskpool.new()
-    var verifier {.used.} = BatchVerifier.init(rng, taskpool)
+      verifier {.used.} = BatchVerifier.init(rng, taskpool)
     let
       quarantine = newClone(Quarantine.init(dag.cfg))
       pool = newClone(AttestationPool.init(dag, quarantine))
@@ -1357,6 +1382,9 @@ suite "Attestation pool heze processing" & preset():
         tally.voted[i] = true
         tally.present[i] = true
         tally.available[i] = true
+
+  teardown:
+    taskpool.shutdown()
 
   # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.0/specs/heze/fork-choice.md#new-is_payload_inclusion_list_satisfied
   test "An unrevealed payload does not satisfy the constraints":
@@ -1466,6 +1494,14 @@ suite "Attestation pool heze processing" & preset():
     let txs = getPayloadInclusionListTransactions(ilPool[], dag, b1Ref)
     check:
       txs.get.len == 0
+
+    # https://github.com/ethereum/consensus-specs/blob/v1.7.0-beta.4/specs/heze/validator.md#executionpayload
+    # A proposer building on `b1`'s parent still asks the EL to include them
+    let buildTxs = getPayloadInclusionListTransactions(
+      ilPool[], dag, b1Ref.parent.bid, prevSlot, only_timely = false)
+    check:
+      buildTxs.get.len == 1
+      buildTxs.get[0] == makeTx([byte 0xAA])
 
   test "The genesis block has no inclusion list constraints":
     check getPayloadInclusionListTransactions(

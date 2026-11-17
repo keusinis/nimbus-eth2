@@ -31,6 +31,7 @@ AllTests-mainnet
 ```diff
 + EL-invalid payload only invalidates the FULL variant                                       OK
 + Inclusion list satisfaction is not recorded before Heze                                    OK
++ Stored payload envelopes are replayed into fork choice on restart                          OK
 ```
 ## Attestation pool heze processing [Preset: mainnet]
 ```diff
@@ -161,6 +162,9 @@ AllTests-mainnet
 ```
 ## Block processor [Preset: mainnet]
 ```diff
++ Execution deadline bounds a distant future block [Preset: mainnet]                         OK
++ Execution deadline follows an early block's slot [Preset: mainnet]                         OK
++ Execution deadline preserves current and late block budgets [Preset: mainnet]              OK
 + Gloas block pops pre-arrived envelope from quarantine [Preset: mainnet]                    OK
 + Gloas block without envelope marks missing [Preset: mainnet]                               OK
 + Gloas chain with no envelopes delivered [Preset: mainnet]                                  OK
@@ -218,6 +222,16 @@ AllTests-mainnet
 ```diff
 + Configuring builder config [Beacon Node] [Preset: mainnet]                                 OK
 + Invalid builder config entries [Beacon Node] [Preset: mainnet]                             OK
+```
+## Builder preferences REST API test suite
+```diff
++ Builder errors are proxied per entry index                                                 OK
++ Empty and malformed request bodies are rejected                                            OK
++ Entries are forwarded to their builders [json]                                             OK
++ Entries are forwarded to their builders [ssz]                                              OK
++ Invalid builder url is reported per entry index                                            OK
++ Missing or pre-Gloas Eth-Consensus-Version is rejected                                     OK
++ Unsupported content type is rejected                                                       OK
 ```
 ## Column reconstruction backfiller cursors
 ```diff
@@ -372,7 +386,9 @@ AllTests-mainnet
 + concurrent forkchoiceUpdated calls                                                         OK
 + forkchoiceUpdated without payload attributes doesn't cache                                 OK
 + getPayload makes new forkchoiceUpdated when parameters change                              OK
++ getPayload makes new forkchoiceUpdatedV5 when inclusion lists change                       OK
 + getPayload reuses cached forkchoiceUpdated when parameters match                           OK
++ getPayload reuses cached forkchoiceUpdatedV5 with same inclusion lists                     OK
 + getPayload with different forkchoiceUpdated attributes                                     OK
 + multiple sequential forkchoiceUpdated calls with payload attributes                        OK
 ```
@@ -389,6 +405,8 @@ AllTests-mainnet
 + forkchoiceUpdated with payload attributes                                                  OK
 + forkchoiceUpdated with response delay                                                      OK
 + forkchoiceUpdatedV4 basic call                                                             OK
++ forkchoiceUpdatedV5 basic call                                                             OK
++ forkchoiceUpdatedV5 sends inclusion list transactions                                      OK
 ```
 ## EL Manager - getBlobsV2
 ```diff
@@ -406,11 +424,14 @@ AllTests-mainnet
 ## EL Manager - getPayload
 ```diff
 + success without retry                                                                      OK
++ success without retry using forkchoiceUpdatedV5                                            OK
 + success without retry using getPayloadV6                                                   OK
 ```
 ## EL Manager - newPayload
 ```diff
++ Heze uses newPayloadV6 with inclusion list transactions                                    OK
 + newPayload times out without selected response                                             OK
++ newPayloadV6 reports unsatisfied inclusion list                                            OK
 + success without retry                                                                      OK
 + success without retry using newPayloadV5                                                   OK
 ```
@@ -966,9 +987,10 @@ AllTests-mainnet
 + Duplicate validator in PTC - multiple signatures [Preset: mainnet]                         OK
 + Get all payload attestations in the pool [Preset: mainnet]                                 OK
 + Multiple validators in PTC can attest [Preset: mainnet]                                    OK
++ PTC comes from the attested block's branch [Preset: mainnet]                               OK
 + Payload attestations get pruned [Preset: mainnet]                                          OK
 + Same validator, conflicting votes are ignored [Preset: mainnet]                            OK
-+ get_ptc with ShufflingRef matches StateCache version [Preset: mainnet]                     OK
++ get_ptc with ShufflingRef or EpochRef matches StateCache [Preset: mainnet]                 OK
 ```
 ## PeerPool testing suite
 ```diff
@@ -998,11 +1020,17 @@ AllTests-mainnet
 ## REST encoding and decoding
 ```diff
 + Blob                                                                                       OK
++ BoundedString JSON                                                                         OK
++ BoundedString SSZ encoding as object field                                                 OK
++ BoundedString SSZ encoding matches List[byte, N]                                           OK
++ BoundedString init                                                                         OK
 + BuilderConfig round-trip                                                                   OK
 + DenebSignedBlockContents decoding                                                          OK
 + GloasProducedBlockContents round-trip                                                      OK
++ JustificationBits                                                                          OK
 + KzgCommitment                                                                              OK
 + KzgProof                                                                                   OK
++ ProduceBlockResponseV4 UInt256 value decoding                                              OK
 + ProduceBlockResponseV4 decodeBytes SSZ (block only)                                        OK
 + ProduceBlockResponseV4 decodeBytes rejects pre-Gloas                                       OK
 + RestErrorMessage parser tests                                                              OK
@@ -1143,6 +1171,7 @@ AllTests-mainnet
 ```
 ## Specific field types
 ```diff
++ JustificationBits                                                                          OK
 + root update                                                                                OK
 + roundtrip                                                                                  OK
 ```

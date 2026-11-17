@@ -30,6 +30,8 @@ from std/strutils import rsplit
 from chronos/unittest2/asynctests import asyncTest
 from ../beacon_chain/consensus_object_pools/attestation_pool import
   AttestationPool, init
+from ../beacon_chain/consensus_object_pools/inclusion_list_pool import
+  InclusionListPool, init
 from ../beacon_chain/spec/column_map import supernodeMap
 from ../beacon_chain/spec/eth2_apis/dynamic_fee_recipients import
   DynamicFeeRecipientsStore, init
@@ -61,6 +63,7 @@ proc pruneAtFinalization(dag: ChainDAGRef) =
 
 suite "Block processor" & preset():
   setup:
+    var taskpool = Taskpool.new()
     let
       rng = HmacDrbgContext.new()
       cfg = block:
@@ -76,7 +79,6 @@ suite "Block processor" & preset():
       db = cfg.makeTestDB(SLOTS_PER_EPOCH)
       validatorMonitor = newClone(ValidatorMonitor.init(cfg))
       dag = ChainDAGRef.init(cfg, db, validatorMonitor, {})
-      taskpool = Taskpool.new()
       quarantine = newClone(Quarantine.init(cfg))
       dataColumnQuarantine = newClone(FuluColumnQuarantine())
       gloasColumnQuarantine = newClone(GloasColumnQuarantine())
@@ -87,6 +89,7 @@ suite "Block processor" & preset():
       consensusManager = ConsensusManager.new(
         dag,
         attestationPool,
+        newClone(InclusionListPool.init(cfg)),
         quarantine,
         elManager,
         actionTracker,
@@ -106,6 +109,59 @@ suite "Block processor" & preset():
     cfg.process_slots(state[], cfg.lastPremergeSlotInTestCfg, cache, info, {}).expect(
       "OK"
     )
+
+  teardown:
+    taskpool.shutdown()
+
+  test "Execution deadline follows an early block's slot" & preset():
+    let
+      blockSlot = Slot(2)
+      slotStart = blockSlot.start_beacon_time(dag.timeParams)
+      wallTime = slotStart - chronos.milliseconds(400)
+      cutoff =
+        (blockSlot + 1).start_beacon_time(dag.timeParams) - chronos.seconds(1)
+
+    check:
+      nextSlotDeadline(wallTime, dag, blockSlot) ==
+        chronos.nanoseconds((cutoff - wallTime).nanoseconds)
+      nextSlotDeadline(slotStart, dag, blockSlot) ==
+        chronos.nanoseconds((cutoff - slotStart).nanoseconds)
+
+  test "Execution deadline preserves current and late block budgets" & preset():
+    let
+      blockSlot = Slot(2)
+      slotStart = blockSlot.start_beacon_time(dag.timeParams)
+      cutoff =
+        (blockSlot + 1).start_beacon_time(dag.timeParams) - chronos.seconds(1)
+      wallTime = slotStart + chronos.seconds(1)
+      lateWallTime =
+        (blockSlot + 1).start_beacon_time(dag.timeParams) +
+          chronos.milliseconds(500)
+      lateCutoff =
+        (blockSlot + 2).start_beacon_time(dag.timeParams) - chronos.seconds(1)
+
+    check:
+      nextSlotDeadline(wallTime, dag, blockSlot) ==
+        chronos.nanoseconds((cutoff - wallTime).nanoseconds)
+      nextSlotDeadline(cutoff, dag, blockSlot) == chronos.seconds(0)
+      nextSlotDeadline(cutoff - chronos.nanoseconds(1), dag, blockSlot) ==
+        chronos.nanoseconds(1)
+      nextSlotDeadline(cutoff + chronos.nanoseconds(1), dag, blockSlot) ==
+        chronos.seconds(0)
+      nextSlotDeadline(lateWallTime, dag, blockSlot) ==
+        chronos.nanoseconds((lateCutoff - lateWallTime).nanoseconds)
+
+  test "Execution deadline bounds a distant future block" & preset():
+    let
+      wallSlot = Slot(2)
+      wallTime =
+        wallSlot.start_beacon_time(dag.timeParams) + chronos.seconds(1)
+
+    check:
+      nextSlotDeadline(wallTime, dag, Slot(100)) ==
+        nextSlotDeadline(wallTime, dag, wallSlot + 1)
+      nextSlotDeadline(wallTime, dag, FAR_FUTURE_SLOT) ==
+        nextSlotDeadline(wallTime, dag, wallSlot + 1)
 
   asyncTest "Reverse order block add & get" & preset():
     let
@@ -718,7 +774,8 @@ suite "Block processor" & preset():
       quarantine2 = newClone(Quarantine.init(cfg))
       attestationPool2 = newClone(AttestationPool.init(dag2, quarantine2))
       consensusManager2 = ConsensusManager.new(
-        dag2, attestationPool2, quarantine2, new ELManager,
+        dag2, attestationPool2, newClone(InclusionListPool.init(cfg)),
+        quarantine2, new ELManager,
         default(ActionTracker),
         newClone(DynamicFeeRecipientsStore.init()),
         "", Opt.some default(Eth1Address), defaultGasLimit)

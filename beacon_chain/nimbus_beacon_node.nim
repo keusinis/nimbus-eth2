@@ -611,7 +611,7 @@ proc initFullNode(
 
   let
     consensusManager = ConsensusManager.new(
-      dag, attestationPool, quarantine, node.elManager,
+      dag, attestationPool, inclusionListPool, quarantine, node.elManager,
       ActionTracker.init(
         node.network.nodeId, config.subscribeAllSubnets,
         dag.cfg.EPOCHS_PER_SUBNET_SUBSCRIPTION,
@@ -2478,7 +2478,7 @@ when not defined(windows):
       node.config.statusBarContents,
       dataResolver)
 
-    when compiles(defaultChroniclesStream.outputs[0].writer):
+    when defaultChroniclesStream.outputs.type.arity == 2:
       let tmp = defaultChroniclesStream.outputs[0].writer
 
       defaultChroniclesStream.outputs[0].writer =

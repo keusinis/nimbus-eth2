@@ -51,7 +51,7 @@ func asConsensusType*(rpcExecutionPayload: ExecutionPayloadV1):
     gas_limit: rpcExecutionPayload.gasLimit.uint64,
     gas_used: rpcExecutionPayload.gasUsed.uint64,
     timestamp: rpcExecutionPayload.timestamp.uint64,
-    extra_data: List[byte, MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
+    extra_data: ByteList[MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
     base_fee_per_gas: rpcExecutionPayload.baseFeePerGas,
     block_hash: rpcExecutionPayload.blockHash.asEth2Digest,
     transactions: List[bellatrix.Transaction, MAX_TRANSACTIONS_PER_PAYLOAD].init(
@@ -73,7 +73,7 @@ func asConsensusType*(rpcExecutionPayload: ExecutionPayloadV2):
     gas_limit: rpcExecutionPayload.gasLimit.uint64,
     gas_used: rpcExecutionPayload.gasUsed.uint64,
     timestamp: rpcExecutionPayload.timestamp.uint64,
-    extra_data: List[byte, MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
+    extra_data: ByteList[MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
     base_fee_per_gas: rpcExecutionPayload.baseFeePerGas,
     block_hash: rpcExecutionPayload.blockHash.asEth2Digest,
     transactions: List[bellatrix.Transaction, MAX_TRANSACTIONS_PER_PAYLOAD].init(
@@ -98,7 +98,7 @@ func asConsensusType*(
     gas_limit: rpcExecutionPayload.gasLimit.uint64,
     gas_used: rpcExecutionPayload.gasUsed.uint64,
     timestamp: rpcExecutionPayload.timestamp.uint64,
-    extra_data: List[byte, MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
+    extra_data: ByteList[MAX_EXTRA_DATA_BYTES].init(rpcExecutionPayload.extraData.data),
     base_fee_per_gas: rpcExecutionPayload.baseFeePerGas,
     block_hash: rpcExecutionPayload.blockHash.asEth2Digest,
     transactions: List[bellatrix.Transaction, MAX_TRANSACTIONS_PER_PAYLOAD].init(
@@ -125,7 +125,7 @@ func asConsensusType*(
     gas_limit: rpcExecutionPayload.gasLimit.uint64,
     gas_used: rpcExecutionPayload.gasUsed.uint64,
     timestamp: rpcExecutionPayload.timestamp.uint64,
-    extra_data: List[byte, MAX_EXTRA_DATA_BYTES].init(
+    extra_data: ByteList[MAX_EXTRA_DATA_BYTES].init(
       rpcExecutionPayload.extraData.data),
     base_fee_per_gas: rpcExecutionPayload.baseFeePerGas,
     block_hash: rpcExecutionPayload.blockHash.asEth2Digest,
@@ -280,6 +280,10 @@ func asEngineExecutionPayload*(executionPayload: gloas.ExecutionPayload):
     excessBlobGas: Quantity(executionPayload.excess_blob_gas),
     blockAccessList: executionPayload.block_access_list.asSeq,
     slotNumber: Quantity(executionPayload.slot_number))
+
+func asEngineTransactions*(
+    transactions: openArray[gloas.Transaction]): seq[TypedTransaction] =
+  mapIt(transactions, TypedTransaction(distinctBase(it)))
 
 proc asEngineVersionedHashes*(
     blob_kzg_commitments: deneb.KzgCommitments | gloas.KzgCommitments
