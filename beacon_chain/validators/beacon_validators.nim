@@ -708,10 +708,7 @@ proc proposeBlockAux(
       message: engineBlock.blck, signature: signature, root: blockRoot
     )
 
-  when fork in [ConsensusFork.Heze, ConsensusFork.Eip8321]:
-    debugHezeComment "stub: heze sidecar assembly"
-    let sidecarsOpt = Opt.none(gloas.DataColumnSidecars)
-  elif fork == ConsensusFork.Gloas:
+  when fork >= ConsensusFork.Gloas:
     let sidecarsOpt = Opt.some(signedBlock.assemble_data_column_sidecars(
       engineBid[].eps.blobsBundle.blobs.mapIt(kzg.KzgBlob(bytes: it)),
       engineBid[].eps.blobsBundle.proofs.mapIt(kzg.KzgProof(it)),

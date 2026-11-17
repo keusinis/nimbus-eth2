@@ -367,7 +367,8 @@ proc assemble_data_column_sidecars*(
 
 # https://github.com/ethereum/consensus-specs/blob/v1.7.0-alpha.12/specs/gloas/builder.md#modified-get_data_column_sidecars
 proc assemble_data_column_sidecars*(
-    signed_beacon_block: gloas.SignedBeaconBlock,
+    signed_beacon_block: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+                         eip8321.SignedBeaconBlock,
     blobs: seq[KzgBlob], cell_proofs: seq[KzgProof],
     columns: ColumnMap): gloas.DataColumnSidecars =
   template kzg_commitments(): auto =
@@ -397,7 +398,7 @@ proc assemble_data_column_sidecars*(
 
   template beacon_block_root: untyped = signed_beacon_block.root
 
-  for columnIndex in columns:
+  for columnIndex in column_map.items(columns):
     var
       column = newSeqOfCap[KzgCell](blobs.len)
       kzgProofOfColumn = newSeqOfCap[KzgProof](blobs.len)
