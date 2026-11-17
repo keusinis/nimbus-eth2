@@ -1085,7 +1085,7 @@ proc newPayload*(
 
 proc newPayload*(
     m: ELManager,
-    blck: heze.BeaconBlock,
+    blck: heze.BeaconBlock | eip8321.BeaconBlock,
     envelope: gloas.ExecutionPayloadEnvelope,
     inclusion_list_transactions: seq[gloas.Transaction],
     deadline: DeadlineFuture,

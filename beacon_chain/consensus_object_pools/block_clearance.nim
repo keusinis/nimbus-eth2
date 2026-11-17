@@ -495,7 +495,8 @@ proc addBackfillBlock*(
 
 proc addHeadExecutionPayload*(
     dag: ChainDAGRef,
-    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock,
+    signedBlock: gloas.SignedBeaconBlock | heze.SignedBeaconBlock |
+      eip8321.SignedBeaconBlock,
     signedEnvelope: gloas.SignedExecutionPayloadEnvelope,
     optimisticStatus: OptimisticStatus,
 ): Result[BlockRef, PayloadVerifierError] =
