@@ -1446,7 +1446,7 @@ proc secretsDir*[Conf](config: Conf): string =
   string config.secretsDirFlag.get(InputDir(config.dataDir / "secrets"))
 
 proc hashChainsDir*[Conf](config: Conf): string =
-  string(config.dataDir / "hash_chains")
+  config.dataDir / "hash_chains"
 
 proc walletsDir*(config: BeaconNodeConf): string =
   string config.walletsDirFlag.get(InputDir(config.dataDir / "wallets"))

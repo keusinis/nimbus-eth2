@@ -9,6 +9,8 @@
 
 FROM debian:testing-slim AS build
 
+ARG PRESET=mainnet
+
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get clean && apt update \
@@ -20,7 +22,7 @@ ADD . /root/nimbus-eth2
 
 RUN cd /root/nimbus-eth2 \
  && make -j$(nproc) update \
- && make -j$(nproc) V=1 NIMFLAGS="-d:const_preset=mainnet -d:disableMarchNative" LOG_LEVEL=TRACE nimbus_beacon_node
+ && make -j$(nproc) V=1 NIMFLAGS="-d:const_preset=${PRESET} -d:disableMarchNative" LOG_LEVEL=TRACE nimbus_beacon_node
 
 
 # --------------------------------- #
