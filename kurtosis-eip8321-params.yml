@@ -14,6 +14,8 @@ participants_matrix:
   cl:
     - cl_type: grandine
       cl_image: ${GRANDINE_IMAGE}
+      # Grandine scores Nimbus below its threshold at the Heze fork and drops it
+      cl_extra_params: ["--disable-peer-scoring"]
     - cl_type: nimbus
       cl_image: ${NIMBUS_IMAGE}
       cl_log_level: debug
