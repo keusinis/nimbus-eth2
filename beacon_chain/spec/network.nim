@@ -248,6 +248,8 @@ func getTargetGossipState*(epoch: Epoch, cfg: RuntimeConfig, isBehind: bool):
   epochs.add cfg.ELECTRA_FORK_EPOCH
   epochs.add cfg.FULU_FORK_EPOCH
   epochs.add cfg.GLOAS_FORK_EPOCH
+  epochs.add cfg.HEZE_FORK_EPOCH
+  epochs.add cfg.EIP8321_FORK_EPOCH
 
   # Fusaka, Glamsterdam, and further forks' BPOs epochs interleave with fork
   # epochs; ensure they're treated uniformly.
