@@ -952,6 +952,47 @@ suite "Hash chain secret":
       secureWriteFile(pwdPath, "wrong").isOk
       loadHashChainSecret(hdir, sdir, pubkey).isErr
 
+  test "Get or create persists a new secret and then reuses it":
+    let
+      dir = testDataDir / "hash_chain"
+      hdir = dir / "hash_chains"
+      sdir = dir / "secrets"
+      pubkey = ValidatorPrivKey.fromRaw(
+        hexToSeqByte(MultiplePrivateKeys[0])).get().toPubKey().toPubKey()
+    defer:
+      try: os.removeDir(dir)
+      except OSError: discard
+
+    let created = getOrCreateHashChainSecret(rng[], hdir, sdir, pubkey)
+    check:
+      created.isOk
+      loadHashChainSecret(hdir, sdir, pubkey).get() ==
+        Opt.some(created.get.secret)
+      compute_hash_chain_commitment(created.get.secret, HashChainLength) ==
+        Opt.some(created.get.commitment)
+      getOrCreateHashChainSecret(rng[], hdir, sdir, pubkey) == created
+
+  test "Get or create never replaces an unreadable secret":
+    let
+      dir = testDataDir / "hash_chain"
+      hdir = dir / "hash_chains"
+      sdir = dir / "secrets"
+      pubkey = ValidatorPrivKey.fromRaw(
+        hexToSeqByte(MultiplePrivateKeys[0])).get().toPubKey().toPubKey()
+      path = hashChainSecretPath(hdir, pubkey)
+    defer:
+      try: os.removeDir(dir)
+      except OSError: discard
+
+    check:
+      saveHashChainSecret(
+        rng[], hdir, sdir, pubkey, generateHashChainSecret(rng[])).isOk
+      secureWriteFile(hashChainPasswordPath(sdir, pubkey), "wrong").isOk
+    let stored = readAllChars(path).get()
+    check:
+      getOrCreateHashChainSecret(rng[], hdir, sdir, pubkey).isErr
+      readAllChars(path).get() == stored
+
   test "Commitment and reveals from checkpoints":
     let secret = generateHashChainSecret(rng[])
     var links = @[secret]

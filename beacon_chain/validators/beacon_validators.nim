@@ -1619,6 +1619,41 @@ proc registerValidators*(node: BeaconNode, epoch: Epoch) {.async: (raises: [Canc
   for payloadBuilderAddress, keys in builderKeys:
     await node.registerValidatorsPerBuilder(payloadBuilderAddress, epoch, keys)
 
+proc registerRandaoCommitments*(
+    node: BeaconNode) {.async: (raises: [CancelledError]).} =
+  ## EIP-8321: register a hash chain RANDAO commitment for each local validator
+  ## that has none registered, pending or in the pool
+  var candidates: seq[(AttachedValidator, ValidatorIndex)]
+  withState(node.dag.headState):
+    when consensusFork >= ConsensusFork.Eip8321:
+      for validator in node.attachedValidators[]:
+        # Remote signers have no signing request for registrations
+        if validator.kind != ValidatorKind.Local:
+          continue
+        let index = validator.index.valueOr:
+          continue
+        if node.validatorChangePool[].needsRandaoCommitmentRegistration(
+            forkyState.data, index.uint64):
+          candidates.add (validator, index)
+
+  for (validator, index) in candidates:
+    let (secret, commitment) = getOrCreateHashChainSecret(
+        node.network.rng[], node.config.hashChainsDir(),
+        node.config.secretsDir(), validator.pubkey).valueOr:
+      warn "Unable to prepare RANDAO commitment registration",
+        validator = shortLog(validator), reason = error
+      continue
+    node.hashChains[validator.pubkey] = HashChain.init(secret)
+    let message = RandaoCommitmentRegistration(
+      validator_index: index.uint64, commitment: commitment)
+    # Routing yields, so hash chains for many validators don't stall the node
+    discard await node.router.routeRandaoCommitmentRegistration(
+      SignedRandaoCommitmentRegistration(
+        message: message,
+        signature: get_randao_commitment_registration_signature(
+          node.dag.cfg.GENESIS_FORK_VERSION, node.dag.genesis_validators_root,
+          message, validator.data.privateKey).toValidatorSig()))
+
 proc updateValidators(
     node: BeaconNode, validators: openArray[Validator]) =
   # Since validator indicies are stable, we only check the "updated" range -

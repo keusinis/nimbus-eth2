@@ -16,7 +16,8 @@ import
   ./[attestation_pool, blockchain_dag]
 
 from ../spec/beaconstate import
-  check_bls_to_execution_change, check_randao_commitment_registration
+  check_bls_to_execution_change, check_randao_commitment_registration,
+  has_randao_commitment
 from ../spec/state_transition_block import
   check_attester_slashing, check_proposer_slashing, check_voluntary_exit
 
@@ -182,6 +183,14 @@ func isSeen*(
     pool: ValidatorChangePool, msg: SignedRandaoCommitmentRegistration): bool =
   msg.message.validator_index in
     pool.prior_seen_randao_commitment_registration_indices
+
+func needsRandaoCommitmentRegistration*(
+    pool: ValidatorChangePool, state: eip8321.BeaconState,
+    index: uint64): bool =
+  ## The validator has no commitment registered, pending or in the pool
+  index < state.validators.lenu64 and
+    not state.has_randao_commitment(index) and
+    index notin pool.prior_seen_randao_commitment_registration_indices
 
 func addMessage*(
     pool: var ValidatorChangePool,

@@ -1873,6 +1873,9 @@ proc onSlotStart(node: BeaconNode, wallTime: BeaconTime,
       wallSlot.epoch mod EPOCHS_PER_VALIDATOR_REGISTRATION_SUBMISSION == 0:
     asyncSpawn node.registerValidators(wallSlot.epoch)
 
+  if wallSlot.is_epoch and wallSlot.epoch >= node.dag.cfg.EIP8321_FORK_EPOCH:
+    asyncSpawn node.registerRandaoCommitments()
+
   return false
 
 proc runSlotLoop(node: BeaconNode, startTime: BeaconTime) {.async.} =
