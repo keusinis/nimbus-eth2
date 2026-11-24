@@ -100,6 +100,28 @@ proc loadHashChainSecret*(
     return err("Cannot decrypt " & path & ": " & error)
   ok Opt.some(secret)
 
+proc getOrCreateHashChainSecret*(
+    rng: var HmacDrbgContext, hashChainsDir, secretsDir: string,
+    pubkey: ValidatorPubKey):
+    Result[tuple[secret, commitment: Eth2Digest], string] =
+  ## Stored secret and its commitment, generating and storing a new secret
+  ## when there is none. An unreadable stored secret is an error, never replaced
+  let stored = ? loadHashChainSecret(hashChainsDir, secretsDir, pubkey)
+  if stored.isSome:
+    let commitment = compute_hash_chain_commitment(
+        stored.get, HashChainLength).valueOr:
+      return err("Stored hash chain secret produces a zero link")
+    return ok (stored.get, commitment)
+
+  while true:
+    let
+      secret = generateHashChainSecret(rng)
+      commitment = compute_hash_chain_commitment(
+          secret, HashChainLength).valueOr:
+        continue
+    ? saveHashChainSecret(rng, hashChainsDir, secretsDir, pubkey, secret)
+    return ok (secret, commitment)
+
 func getHashChainReveal*(
     chain: var HashChain, commitment: Eth2Digest): Opt[Eth2Digest] =
   if chain.checkpoints.len == 0:
