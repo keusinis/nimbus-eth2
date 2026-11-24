@@ -28,6 +28,7 @@ from std/sequtils import mapIt, toSeq
 from ../beacon_chain/spec/datatypes/capella import
   SignedBLSToExecutionChangeList
 from ./testbcutil import addHeadBlock
+from ../beacon_chain/spec/blake3 import compute_hash_chain_link
 
 const
   nilPhase0Callback = OnBlockAdded[ConsensusFork.Phase0](nil)
@@ -2134,6 +2135,50 @@ suite "Shufflings (merged)":
     cfg.BELLATRIX_FORK_EPOCH = GENESIS_EPOCH
     cfg
   runShufflingTests(cfg, numRandomTests = 50)
+
+suite "computeRandaoMix (EIP-8321)":
+  test "Hash chain reveal matches process_randao":
+    let cfg = block:
+      var cfg = defaultRuntimeConfig
+      cfg.ALTAIR_FORK_EPOCH = GENESIS_EPOCH
+      cfg.BELLATRIX_FORK_EPOCH = GENESIS_EPOCH
+      cfg.CAPELLA_FORK_EPOCH = GENESIS_EPOCH
+      cfg.DENEB_FORK_EPOCH = GENESIS_EPOCH
+      cfg.ELECTRA_FORK_EPOCH = GENESIS_EPOCH
+      cfg.FULU_FORK_EPOCH = GENESIS_EPOCH
+      cfg.GLOAS_FORK_EPOCH = GENESIS_EPOCH
+      cfg.HEZE_FORK_EPOCH = GENESIS_EPOCH
+      cfg.EIP8321_FORK_EPOCH = GENESIS_EPOCH
+      cfg
+    let state = initGenesisState(cfg)
+    var
+      cache: StateCache
+      info: ForkedEpochInfo
+    check process_slots(cfg, state[], GENESIS_SLOT + 1, cache, info, {}).isOk
+
+    withState(state[]):
+      when consensusFork == ConsensusFork.Eip8321:
+        let
+          epoch = forkyState.data.get_current_epoch()
+          proposer = get_beacon_proposer_index(forkyState.data, cache).get
+        var reveal: Eth2Digest
+        reveal.data[0] = 1
+        forkyState.data.randao_commitments[proposer] =
+          compute_hash_chain_link(reveal)
+
+        var blck: eip8321.TrustedSignedBeaconBlock
+        blck.message.slot = forkyState.data.slot
+        blck.message.body.randao_reveal.blob = ValidatorSig.infinity().blob
+        blck.message.body.hash_chain_reveal = reveal
+        blck.message.body.signed_execution_payload_bid.message.prev_randao =
+          forkyState.data.get_randao_mix(epoch)
+
+        check:
+          process_randao(forkyState.data, blck.message.body, {}, cache).isOk
+          computeRandaoMix(ForkedTrustedSignedBeaconBlock.init(blck)) ==
+            Opt.some forkyState.data.get_randao_mix(epoch)
+      else:
+        check false
 
 suite "Fast confirmation" & preset():
   setup:

@@ -17,6 +17,8 @@ import
   ../[beacon_chain_db, beacon_clock, era_db],
   ./[block_pools_types, block_quarantine]
 
+from ../spec/blake3 import compute_hash_chain_mix
+
 export
   eth2_merkleization, eth2_ssz_serialization,
   block_pools_types, results, beacon_chain_db
@@ -1786,19 +1788,25 @@ proc ancestorSlot*(
 
   Opt.some stateBid.slot
 
-proc computeRandaoMix(
+proc computeRandaoMix*(
     bdata: ForkedTrustedSignedBeaconBlock): Opt[Eth2Digest] =
   ## Compute the requested RANDAO mix for `bdata` without `state`, if possible.
   withBlck(bdata):
     when consensusFork >= ConsensusFork.Bellatrix:
       template bdata: auto = forkyBlck.message
       if bdata.slot > GENESIS_SLOT and bdata.is_execution_block:
-        var mix = eth2digest(bdata.body.randao_reveal.toRaw())
-        mix.data.mxor(
+        let prev_randao =
           when consensusFork >= ConsensusFork.Gloas:
-            bdata.body.signed_execution_payload_bid.message.prev_randao.data
+            bdata.body.signed_execution_payload_bid.message.prev_randao
           else:
-            bdata.body.execution_payload.prev_randao.data)
+            bdata.body.execution_payload.prev_randao
+        when consensusFork >= ConsensusFork.Eip8321:
+          # See `process_randao`: a hash chain reveal replaces the BLS mix-in
+          if not bdata.body.hash_chain_reveal.isZero:
+            return ok compute_hash_chain_mix(
+              prev_randao, bdata.body.hash_chain_reveal)
+        var mix = eth2digest(bdata.body.randao_reveal.toRaw())
+        mix.data.mxor(prev_randao.data)
         return ok mix
   Opt.none(Eth2Digest)
 
