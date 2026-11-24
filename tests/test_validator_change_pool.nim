@@ -176,6 +176,29 @@ suite "Validator change pool testing suite":
             # Ensure priority of API to gossip messages is observed
             allIt(priorityMessages, pool[].isSeen(it))
 
+  test "needsRandaoCommitmentRegistration":
+    let state = (ref eip8321.BeaconState)()
+    for _ in 0 ..< 4:
+      check:
+        state.validators.add Validator()
+        state.randao_commitments.add default(Eth2Digest)
+    state.randao_commitments.mitem(0).data[0] = 1
+    check state.pending_randao_commitments.add PendingRandaoCommitment(
+      validator_index: 1, commitment: state.randao_commitments.item(0))
+    pool[].addMessage(
+      SignedRandaoCommitmentRegistration(
+        message: RandaoCommitmentRegistration(validator_index: 2)),
+      localPriorityMessage = false)
+
+    check:
+      # Registered, pending, already in the pool
+      not pool[].needsRandaoCommitmentRegistration(state[], 0)
+      not pool[].needsRandaoCommitmentRegistration(state[], 1)
+      not pool[].needsRandaoCommitmentRegistration(state[], 2)
+      pool[].needsRandaoCommitmentRegistration(state[], 3)
+      # Not in the state yet
+      not pool[].needsRandaoCommitmentRegistration(state[], 4)
+
   test "pre-pre-fork voluntary exit":
     var
       cache: StateCache
